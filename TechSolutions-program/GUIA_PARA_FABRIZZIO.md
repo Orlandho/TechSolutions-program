@@ -1,566 +1,932 @@
-# 📚 GUÍA COMPLETA PARA FABRIZZIO - TechSolutions
+# 🚀 GUÍA RÁPIDA PARA FABRIZZIO - TechSolutions
 
-## 🎯 Propósito de este Documento
-Esta guía te ayudará a entender **qué métodos de los controladores y servicios debes usar en cada vista (View)** y **por qué**. 
+## 👋 ¡Hola Fabrizzio!
 
----
-
-## 🏗️ Arquitectura del Sistema
-
-```
-┌─────────────────┐
-│     VISTAS      │ ← Lo que ve el usuario (archivos .cshtml)
-│   (Views)       │
-└────────┬────────┘
-         │ asp-action="NombreMetodo"
-         │ asp-controller="NombreControlador"
-         ↓
-┌─────────────────┐
-│  CONTROLADORES  │ ← Reciben las peticiones y coordinan
-│ (Controllers)   │
-└────────┬────────┘
-         │ Llaman a métodos de servicios
-         ↓
-┌─────────────────┐
-│   SERVICIOS     │ ← Contienen la lógica de negocio
-│  (Services)     │
-└────────┬────────┘
-         │ Usan repositorios o DbContext
-         ↓
-┌─────────────────┐
-│  BASE DE DATOS  │ ← Almacena la información
-│    (SQL Server) │
-└─────────────────┘
-```
+Esta guía te ayudará a crear las vistas (Views) de forma **rápida, sencilla y funcional**. Encontrarás:
+- ✅ Plantillas listas para copiar y pegar
+- ✅ Explicación del flujo del sistema
+- ✅ Ejemplos claros y funcionales
+- ✅ Permisos para arreglar código si encuentras errores
 
 ---
 
-## 📋 CÓMO CONECTAR VISTAS CON MÉTODOS DE CONTROLADORES
+## 🎯 REGLA DE ORO
 
-### 🔗 Sintaxis Básica para Llamar Métodos desde las Vistas
+**Si encuentras un error en los controladores, servicios o modelos: ¡ARRÉGLALO!**
 
-#### 1. **Enlaces (Links)**
+No tengas miedo de modificar código si algo no funciona correctamente. Tu objetivo es que todo el sistema funcione de principio a fin.
+
+---
+
+## 🗺️ FLUJO COMPLETO DEL SISTEMA
+
+### 1️⃣ Flujo de Autenticación (Login → Dashboard)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    INICIO DE LA APLICACIÓN                      │
+└─────────────────────┬───────────────────────────────────────────┘
+                      │
+                      ↓
+              ┌───────────────┐
+              │   Home/Index  │  ← Página de bienvenida
+              │  (pública)    │
+              └───────┬───────┘
+                      │
+        ┌─────────────┴──────────────┐
+        │                            │
+        ↓                            ↓
+┌──────────────┐            ┌──────────────┐
+│ Usuario NO   │            │ Usuario SÍ   │
+│ autenticado  │            │ autenticado  │
+└──────┬───────┘            └──────┬───────┘
+       │                           │
+       ↓                           ↓
+┌─────────────────┐      ┌──────────────────┐
+│ Click en Login  │      │ Ya puede acceder │
+└────────┬────────┘      │ a las funciones  │
+         │               └─────────┬────────┘
+         ↓                         │
+┌──────────────────────┐          │
+│ Autenticacion/Login  │          │
+│ (Formulario)         │          │
+└─────────┬────────────┘          │
+          │                        │
+          ↓                        │
+     Ingresa email                 │
+     y contraseña                  │
+          │                        │
+          ↓                        │
+    ┌─────────────┐               │
+    │ ¿Correcto?  │               │
+    └──┬──────┬───┘               │
+       │      │                    │
+    NO │      │ SÍ                 │
+       ↓      ↓                    ↓
+   Muestra  ┌──────────────────────────────────┐
+   error    │ Redirige según rol:              │
+            │                                  │
+            │ • Líder → /Proyectos/Index       │
+            │ • Desarrollador → /Tareas/MisTareas │
+            │ • Administrador → /Proyectos/Index  │
+            └──────────────────────────────────┘
+```
+
+### 2️⃣ Flujo Principal por Rol
+
+#### 🔵 LÍDER (Gestiona proyectos y tareas)
+```
+Login exitoso
+    ↓
+/Proyectos/Index (lista de proyectos)
+    ↓
+Puede:
+├─ Ver proyectos → /Proyectos/Details/{id}
+├─ Crear proyecto → /Proyectos/Create
+├─ Editar proyecto → /Proyectos/Edit/{id}
+├─ Eliminar proyecto → /Proyectos/Delete/{id}
+├─ Generar reportes → /Reportes/Descargar
+├─ Ver todas las tareas → /Tareas/Index
+├─ Crear tareas → /Tareas/Create
+├─ Editar tareas → /Tareas/Edit/{id}
+├─ Eliminar tareas → /Tareas/Delete/{id}
+├─ Cambiar estado de tareas → /Tareas/CambiarEstado
+└─ Ver dashboard → /Seguimiento/Index
+```
+
+#### 🟢 DESARROLLADOR (Solo trabaja en sus tareas)
+```
+Login exitoso
+    ↓
+/Tareas/MisTareas (solo sus tareas asignadas)
+    ↓
+Puede:
+├─ Ver sus tareas → /Tareas/MisTareas
+├─ Cambiar estado de sus tareas → /Tareas/CambiarEstado
+│   ├─ Pendiente → En Progreso
+│   └─ En Progreso → Finalizado
+├─ Ver proyectos (solo lectura) → /Proyectos/Index
+└─ Ver dashboard → /Seguimiento/Index
+```
+
+### 3️⃣ Flujo de Cambio de Estado de Tarea (MUY IMPORTANTE)
+
+```
+Desarrollador entra a /Tareas/MisTareas
+    ↓
+Ve su tarea con estado "Pendiente"
+    ↓
+Click en botón "Iniciar Tarea"
+    ↓
+POST /Tareas/CambiarEstado
+    │
+    ├─ id: 5 (ID de la tarea)
+    └─ nuevoEstado: "En Progreso"
+    ↓
+TareasController.CambiarEstado()
+    ↓
+TareaService.CambiarEstadoAsync()
+    ↓
+Base de datos actualizada
+    ↓
+Redirige de vuelta a /Tareas/MisTareas
+    ↓
+Ahora el botón dice "Marcar como Completa"
+    ↓
+Click en "Marcar como Completa"
+    ↓
+POST /Tareas/CambiarEstado
+    │
+    ├─ id: 5
+    └─ nuevoEstado: "Finalizado"
+    ↓
+Tarea marcada como completada ✅
+```
+
+---
+
+## 📋 PLANTILLAS LISTAS PARA USAR
+
+### 🔹 Plantilla 1: Vista de Listado (Index.cshtml)
+
+**Copiar y pegar esto para crear cualquier vista de listado:**
+
 ```html
-<!-- Llama al método Index del controlador Clientes -->
-<a asp-controller="Clientes" asp-action="Index">Ver Clientes</a>
+@*
+    VISTA: Index de [NOMBRE_ENTIDAD]
+    QUÉ HACE: Muestra la lista de todos los [nombre entidad]
+    CONTROLADOR: [Nombre]Controller.Index() [GET]
+*?
+@model IEnumerable<TechSolutions_program.Models.[NOMBRE_MODELO]>
 
-<!-- Llama al método Details pasando un ID -->
-<a asp-action="Details" asp-route-id="@cliente.Id">Ver Detalles</a>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>[NOMBRE_ENTIDAD]</h1>
+        
+        @* Botón Nuevo (solo para roles permitidos) *@
+        @if (User.IsInRole("Lider") || User.IsInRole("Administrador"))
+        {
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Nuevo [Nombre]
+            </a>
+        }
+    </div>
 
-<!-- Llama al método Descargar con múltiples parámetros -->
-<a asp-action="Descargar" 
-   asp-route-tipoReporte="pdf" 
-   asp-route-proyectoId="@proyecto.Id">
-   Descargar PDF
-</a>
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>[Columna 1]</th>
+                <th>[Columna 2]</th>
+                <th>[Columna 3]</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.[Propiedad1]</td>
+                    <td>@item.[Propiedad2]</td>
+                    <td>@item.[Propiedad3]</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">
+                            <i class="bi bi-eye"></i> Ver
+                        </a>
+                        
+                        @if (User.IsInRole("Lider") || User.IsInRole("Administrador"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
 ```
 
-#### 2. **Formularios (Forms)**
-```html
-<!-- Llama al método Create [POST] cuando se hace submit -->
-<form asp-action="Create" method="post">
-    @Html.AntiForgeryToken()  <!-- SIEMPRE incluir esto -->
-    <input asp-for="Nombre" />
-    <button type="submit">Guardar</button>
-</form>
-
-<!-- Llama al método CambiarEstado con parámetros -->
-<form asp-action="CambiarEstado" asp-route-id="@tarea.Id" method="post">
-    @Html.AntiForgeryToken()
-    <button type="submit" name="nuevoEstado" value="Finalizado">
-        Marcar como Completa
-    </button>
-</form>
-```
+**Reemplaza:**
+- `[NOMBRE_ENTIDAD]` → Proyectos, Tareas, Clientes, etc.
+- `[NOMBRE_MODELO]` → Proyecto, Tarea, Cliente, etc.
+- `[Propiedad1]`, `[Propiedad2]` → Nombre, Estado, Cliente, etc.
 
 ---
 
-## 🗂️ RELACIÓN ENTRE VISTAS Y MÉTODOS DE CONTROLADORES
+### 🔹 Plantilla 2: Vista de Creación (Create.cshtml)
 
-### 📁 **CLIENTES** (ClientesController)
-
-| Vista | Método del Controlador | Qué Hace | Cómo Usarlo en la Vista |
-|-------|------------------------|----------|-------------------------|
-| `Index.cshtml` | `ClientesController.Index() [GET]` | Muestra la lista de clientes | Se carga automáticamente |
-| | `ClientesController.Create() [GET]` | Botón "Nuevo Cliente" | `<a asp-action="Create">Nuevo</a>` |
-| | `ClientesController.Details(id) [GET]` | Botón "Ver Detalles" | `<a asp-action="Details" asp-route-id="@cliente.Id">Detalles</a>` |
-| | `ClientesController.Edit(id) [GET]` | Botón "Editar" | `<a asp-action="Edit" asp-route-id="@cliente.Id">Editar</a>` |
-| | `ClientesController.Delete(id) [GET]` | Botón "Eliminar" | `<a asp-action="Delete" asp-route-id="@cliente.Id">Eliminar</a>` |
-| `Create.cshtml` | `ClientesController.Create() [GET]` | Muestra el formulario vacío | Se carga automáticamente |
-| | `ClientesController.Create(cliente) [POST]` | Procesa el formulario | `<form asp-action="Create" method="post">` |
-| `Edit.cshtml` | `ClientesController.Edit(id) [GET]` | Muestra el formulario con datos | Se carga automáticamente |
-| | `ClientesController.Edit(id, cliente) [POST]` | Guarda los cambios | `<form asp-action="Edit" method="post">` |
-| `Delete.cshtml` | `ClientesController.Delete(id) [GET]` | Muestra confirmación | Se carga automáticamente |
-| | `ClientesController.DeleteConfirmed(id) [POST]` | Elimina el cliente | `<form asp-action="Delete" method="post">` |
-| `Details.cshtml` | `ClientesController.Details(id) [GET]` | Muestra información | Se carga automáticamente |
-
----
-
-### 📁 **PROYECTOS** (ProyectosController)
-
-| Vista | Método del Controlador | Qué Hace | Seguridad | Cómo Usarlo |
-|-------|------------------------|----------|-----------|-------------|
-| `Index.cshtml` | `ProyectosController.Index() [GET]` | Lista proyectos | Todos | Carga automática |
-| | `ProyectosController.Create() [GET]` | Botón "Nuevo Proyecto" | Líder/Admin | `<a asp-action="Create">Nuevo</a>` |
-| | `ProyectosController.Edit(id) [GET]` | Botón "Editar" | Líder/Admin | `<a asp-action="Edit" asp-route-id="@id">Editar</a>` |
-| | `ProyectosController.Delete(id) [GET]` | Botón "Eliminar" | Líder/Admin | `<a asp-action="Delete" asp-route-id="@id">Eliminar</a>` |
-| | `ReportesController.Descargar(tipo, id)` | Descargar reportes | Todos | `<a asp-controller="Reportes" asp-action="Descargar" asp-route-tipoReporte="pdf" asp-route-proyectoId="@id">PDF</a>` |
-| `Create.cshtml` | `ProyectosController.Create() [POST]` | Crea proyecto | Líder/Admin | `<form asp-action="Create" method="post">` |
-| `Edit.cshtml` | `ProyectosController.Edit(id) [POST]` | Actualiza proyecto | Líder/Admin | `<form asp-action="Edit" method="post">` |
-| `Delete.cshtml` | `ProyectosController.DeleteConfirmed(id) [POST]` | Elimina proyecto | Líder/Admin | `<form asp-action="Delete" method="post">` |
-
-**IMPORTANTE:** Los botones Create, Edit y Delete deben mostrarse SOLO si el usuario tiene rol Líder o Administrador:
 ```html
-@if (User.IsInRole("Lider") || User.IsInRole("Administrador"))
-{
-    <a asp-action="Create">Nuevo Proyecto</a>
+@*
+    VISTA: Create de [NOMBRE_ENTIDAD]
+    QUÉ HACE: Formulario para crear un nuevo [nombre]
+    CONTROLADOR: [Nombre]Controller.Create() [POST]
+*?
+@model TechSolutions_program.Models.[NOMBRE_MODELO]
+
+<div class="container mt-4">
+    <h1>Crear [Nombre]</h1>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-6">
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                @* Campo 1 *@
+                <div class="form-group mb-3">
+                    <label asp-for="[Propiedad1]" class="form-label"></label>
+                    <input asp-for="[Propiedad1]" class="form-control" />
+                    <span asp-validation-for="[Propiedad1]" class="text-danger"></span>
+                </div>
+
+                @* Campo 2 *@
+                <div class="form-group mb-3">
+                    <label asp-for="[Propiedad2]" class="form-label"></label>
+                    <input asp-for="[Propiedad2]" class="form-control" />
+                    <span asp-validation-for="[Propiedad2]" class="text-danger"></span>
+                </div>
+
+                @* Agrega más campos según tu modelo *@
+
+                <div class="form-group mt-4">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle"></i> Guardar
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
 }
 ```
 
 ---
 
-### 📁 **TAREAS** (TareasController)
-
-| Vista | Método del Controlador | Qué Hace | Seguridad | Cómo Usarlo |
-|-------|------------------------|----------|-----------|-------------|
-| `Index.cshtml` | `TareasController.Index() [GET]` | Lista TODAS las tareas | Solo Líder | Carga automática |
-| | `TareasController.CambiarEstado(id, estado) [POST]` | **MÉTODO CLAVE** para botones | Líder/Dev | Ver ejemplo abajo |
-| `MisTareas.cshtml` | `TareasController.MisTareas() [GET]` | Lista tareas del usuario | Solo Desarrollador | Carga automática |
-| | `TareasController.CambiarEstado(id, estado) [POST]` | **MÉTODO CLAVE** para botones | Líder/Dev | Ver ejemplo abajo |
-| `Create.cshtml` | `TareasController.Create() [POST]` | Crea tarea | Solo Líder | `<form asp-action="Create">` |
-| `Edit.cshtml` | `TareasController.Edit(id) [POST]` | Actualiza tarea | Solo Líder | `<form asp-action="Edit">` |
-
-#### 🔥 **MÉTODO MÁS IMPORTANTE: CambiarEstado**
-
-Este método es CRÍTICO para que los desarrolladores puedan actualizar el avance de sus tareas:
+### 🔹 Plantilla 3: Vista de Edición (Edit.cshtml)
 
 ```html
-<!-- En Index.cshtml o MisTareas.cshtml -->
-<form asp-action="CambiarEstado" asp-route-id="@tarea.Id" method="post">
-    @Html.AntiForgeryToken()
-    
-    <!-- Si la tarea está Pendiente, mostrar botón para iniciarla -->
-    @if (tarea.Estado == "Pendiente")
-    {
-        <button type="submit" name="nuevoEstado" value="En Progreso" class="btn btn-warning">
-            Iniciar Tarea
+@*
+    VISTA: Edit de [NOMBRE_ENTIDAD]
+    QUÉ HACE: Formulario para editar un [nombre] existente
+    CONTROLADOR: [Nombre]Controller.Edit(id) [POST]
+*?
+@model TechSolutions_program.Models.[NOMBRE_MODELO]
+
+<div class="container mt-4">
+    <h1>Editar [Nombre]</h1>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-6">
+            <form asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+                <input asp-for="Id" type="hidden" />  @* ¡MUY IMPORTANTE! *@
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                @* Campo 1 *@
+                <div class="form-group mb-3">
+                    <label asp-for="[Propiedad1]" class="form-label"></label>
+                    <input asp-for="[Propiedad1]" class="form-control" />
+                    <span asp-validation-for="[Propiedad1]" class="text-danger"></span>
+                </div>
+
+                @* Campo 2 *@
+                <div class="form-group mb-3">
+                    <label asp-for="[Propiedad2]" class="form-label"></label>
+                    <input asp-for="[Propiedad2]" class="form-control" />
+                    <span asp-validation-for="[Propiedad2]" class="text-danger"></span>
+                </div>
+
+                @* Agrega más campos según tu modelo *@
+
+                <div class="form-group mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Guardar Cambios
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+```
+
+**⚠️ IMPORTANTE:** Nunca olvides `<input asp-for="Id" type="hidden" />` en formularios de edición.
+
+---
+
+### 🔹 Plantilla 4: Vista de Eliminación (Delete.cshtml)
+
+```html
+@*
+    VISTA: Delete de [NOMBRE_ENTIDAD]
+    QUÉ HACE: Confirmación antes de eliminar
+    CONTROLADOR: [Nombre]Controller.DeleteConfirmed(id) [POST]
+*?
+@model TechSolutions_program.Models.[NOMBRE_MODELO]
+
+<div class="container mt-4">
+    <h1>Eliminar [Nombre]</h1>
+    <hr />
+
+    <div class="alert alert-warning" role="alert">
+        <i class="bi bi-exclamation-triangle"></i>
+        <strong>¡Atención!</strong> ¿Está seguro que desea eliminar este registro?
+    </div>
+
+    <dl class="row">
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.[Propiedad1])</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.[Propiedad1])</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.[Propiedad2])</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.[Propiedad2])</dd>
+
+        @* Agrega más propiedades según tu modelo *@
+    </dl>
+
+    <form asp-action="Delete" method="post">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-danger">
+            <i class="bi bi-trash"></i> Confirmar Eliminación
         </button>
-    }
-    
-    <!-- Si está En Progreso, mostrar botón para completarla -->
-    @if (tarea.Estado == "En Progreso")
-    {
-        <button type="submit" name="nuevoEstado" value="Finalizado" class="btn btn-success">
-            Marcar como Completa
-        </button>
-    }
-</form>
-```
-
-**¿Por qué es importante?**
-- Es la única forma en que los Desarrolladores pueden reportar su avance
-- El Líder puede ver en tiempo real cómo van las tareas
-- Alimenta el Dashboard con datos actualizados
-
----
-
-### 📁 **AUTENTICACIÓN** (AutenticacionController)
-
-| Vista | Método del Controlador | Qué Hace | Cómo Usarlo |
-|-------|------------------------|----------|-------------|
-| `Login.cshtml` | `AutenticacionController.Login() [GET]` | Muestra formulario de login | Carga automática |
-| | `AutenticacionController.Login(email, password) [POST]` | Valida y autentica usuario | `<form asp-action="Login" method="post">` |
-| `_LoginPartial.cshtml` | `AutenticacionController.Logout() [POST]` | Cierra sesión | `<form asp-action="Logout" method="post">` |
-
-**Formulario de Login Completo:**
-```html
-<form asp-action="Login" method="post">
-    @Html.AntiForgeryToken()
-    <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
-    
-    <div>
-        <label>Email</label>
-        <input name="email" type="email" required />
-    </div>
-    
-    <div>
-        <label>Contraseña</label>
-        <input name="password" type="password" required />
-    </div>
-    
-    <button type="submit">Iniciar Sesión</button>
-</form>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Cancelar
+        </a>
+    </form>
+</div>
 ```
 
 ---
 
-### 📁 **REPORTES** (ReportesController)
+### 🔹 Plantilla 5: Vista de Detalles (Details.cshtml)
 
-| Vista | Método del Controlador | Qué Hace | Cómo Usarlo |
-|-------|------------------------|----------|-------------|
-| `Index.cshtml` | `ReportesController.Index() [GET]` | Muestra opciones | Carga automática |
-| | `ReportesController.Descargar(tipo, proyectoId)` | Genera PDF o Excel | Ver ejemplo abajo |
-
-**Generación de Reportes:**
 ```html
-<!-- Descargar PDF -->
-<a asp-controller="Reportes" 
-   asp-action="Descargar" 
-   asp-route-tipoReporte="pdf" 
-   asp-route-proyectoId="@proyecto.Id" 
-   class="btn btn-danger">
-   📄 Descargar PDF
-</a>
+@*
+    VISTA: Details de [NOMBRE_ENTIDAD]
+    QUÉ HACE: Muestra información detallada (solo lectura)
+    CONTROLADOR: [Nombre]Controller.Details(id) [GET]
+*?
+@model TechSolutions_program.Models.[NOMBRE_MODELO]
 
-<!-- Descargar Excel -->
-<a asp-controller="Reportes" 
-   asp-action="Descargar" 
-   asp-route-tipoReporte="excel" 
-   asp-route-proyectoId="@proyecto.Id" 
-   class="btn btn-success">
-   📊 Descargar Excel
-</a>
-```
+<div class="container mt-4">
+    <h1>Detalles de [Nombre]</h1>
+    <hr />
 
----
+    <dl class="row">
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.[Propiedad1])</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.[Propiedad1])</dd>
 
-### 📁 **DASHBOARD** (SeguimientoController)
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.[Propiedad2])</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.[Propiedad2])</dd>
 
-| Vista | Método del Controlador | Qué Hace | Datos que Muestra |
-|-------|------------------------|----------|-------------------|
-| `Index.cshtml` | `SeguimientoController.Index() [GET]` | Muestra métricas | `@Model.TotalProyectos`, `@Model.PresupuestoTotal`, `@Model.TareasPendientes`, `@Model.TareasCompletadas` |
+        @* Agrega más propiedades según tu modelo *@
+    </dl>
 
-**Mostrar los Datos:**
-```html
-<div class="dashboard">
-    <div class="card">
-        <h3>@Model.TotalProyectos</h3>
-        <p>Proyectos Activos</p>
-    </div>
-    
-    <div class="card">
-        <h3>S/ @Model.PresupuestoTotal.ToString("N2")</h3>
-        <p>Presupuesto Total</p>
-    </div>
-    
-    <div class="card">
-        <h3>@Model.TareasPendientes</h3>
-        <p>Tareas Pendientes</p>
-    </div>
-    
-    <div class="card">
-        <h3>@Model.TareasCompletadas</h3>
-        <p>Tareas Completadas</p>
+    <div class="mt-4">
+        @if (User.IsInRole("Lider") || User.IsInRole("Administrador"))
+        {
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                <i class="bi bi-pencil"></i> Editar
+            </a>
+            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">
+                <i class="bi bi-trash"></i> Eliminar
+            </a>
+        }
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Volver al Listado
+        </a>
     </div>
 </div>
 ```
 
 ---
 
-## 🔐 SEGURIDAD Y ROLES
+## 🎯 CASOS ESPECIALES
 
-### Roles del Sistema
-- **Desarrollador**: Solo puede ver sus tareas y cambiar su estado
-- **Líder**: Puede crear, editar y eliminar proyectos y tareas
-- **Administrador**: Acceso completo al sistema
+### 🔥 Caso 1: Vista de Tareas con Botones de Estado (MisTareas.cshtml)
 
-### Verificar Roles en las Vistas
+**ESTA ES LA VISTA MÁS IMPORTANTE PARA LOS DESARROLLADORES**
+
 ```html
-<!-- Mostrar solo si el usuario está autenticado -->
-@if (User.Identity.IsAuthenticated)
-{
-    <p>Bienvenido, @User.Identity.Name</p>
-}
+@*
+    VISTA: MisTareas
+    QUÉ HACE: Muestra las tareas asignadas al desarrollador con botones para cambiar estado
+    CONTROLADOR: TareasController.MisTareas() [GET] y TareasController.CambiarEstado() [POST]
+*?
+@model IEnumerable<TechSolutions_program.Models.Tarea>
 
-<!-- Mostrar solo para Líderes -->
-@if (User.IsInRole("Lider"))
-{
-    <a asp-action="Create">Nuevo Proyecto</a>
-}
+<div class="container mt-4">
+    <h1>Mis Tareas Asignadas</h1>
+    <hr />
 
-<!-- Mostrar solo para Desarrolladores -->
-@if (User.IsInRole("Desarrollador"))
-{
-    <a asp-action="MisTareas">Mis Tareas</a>
-}
-
-<!-- Mostrar para múltiples roles -->
-@if (User.IsInRole("Lider") || User.IsInRole("Administrador"))
-{
-    <a asp-action="Edit">Editar</a>
-}
-```
-
----
-
-## ⚡ REGLAS IMPORTANTES
-
-### 1. **SIEMPRE incluir el token anti-falsificación en formularios POST**
-```html
-<form asp-action="Create" method="post">
-    @Html.AntiForgeryToken()  <!-- ¡NUNCA OLVIDAR ESTO! -->
-    <!-- resto del formulario -->
-</form>
-```
-
-### 2. **En formularios de edición, incluir el ID como campo oculto**
-```html
-<form asp-action="Edit" method="post">
-    <input asp-for="Id" type="hidden" />  <!-- CRÍTICO -->
-    <input asp-for="Nombre" />
-    <button type="submit">Guardar</button>
-</form>
-```
-
-### 3. **Mostrar errores de validación**
-```html
-<!-- Resumen de errores -->
-<div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-<!-- Error de un campo específico -->
-<input asp-for="Nombre" />
-<span asp-validation-for="Nombre" class="text-danger"></span>
-```
-
----
-
-## 🎨 EJEMPLOS COMPLETOS
-
-### Ejemplo 1: Listado de Proyectos con Acciones
-```html
-@model IEnumerable<Proyecto>
-
-<h1>Proyectos</h1>
-
-@if (User.IsInRole("Lider") || User.IsInRole("Administrador"))
-{
-    <a asp-action="Create" class="btn btn-primary">Nuevo Proyecto</a>
-}
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>Nombre</th>
-            <th>Cliente</th>
-            <th>Presupuesto</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var proyecto en Model)
-        {
+    <table class="table table-striped">
+        <thead>
             <tr>
-                <td>@proyecto.Nombre</td>
-                <td>@proyecto.Cliente</td>
-                <td>@proyecto.Presupuesto.ToString("C2")</td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@proyecto.Id">Ver</a>
-                    
-                    @if (User.IsInRole("Lider") || User.IsInRole("Administrador"))
-                    {
-                        <a asp-action="Edit" asp-route-id="@proyecto.Id">Editar</a>
-                        <a asp-action="Delete" asp-route-id="@proyecto.Id">Eliminar</a>
-                    }
-                    
-                    <a asp-controller="Reportes" 
-                       asp-action="Descargar" 
-                       asp-route-tipoReporte="pdf" 
-                       asp-route-proyectoId="@proyecto.Id">PDF</a>
-                </td>
+                <th>Descripción</th>
+                <th>Proyecto</th>
+                <th>Estado</th>
+                <th>Prioridad</th>
+                <th>Fecha Límite</th>
+                <th>Acciones</th>
             </tr>
-        }
-    </tbody>
-</table>
-```
-
-### Ejemplo 2: Formulario de Creación de Proyecto
-```html
-@model Proyecto
-
-<h1>Crear Proyecto</h1>
-
-<div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-<form asp-action="Create" method="post">
-    @Html.AntiForgeryToken()
-    
-    <div class="form-group">
-        <label asp-for="Nombre"></label>
-        <input asp-for="Nombre" class="form-control" />
-        <span asp-validation-for="Nombre" class="text-danger"></span>
-    </div>
-    
-    <div class="form-group">
-        <label asp-for="Cliente"></label>
-        <input asp-for="Cliente" class="form-control" />
-        <span asp-validation-for="Cliente" class="text-danger"></span>
-    </div>
-    
-    <div class="form-group">
-        <label asp-for="Presupuesto"></label>
-        <input asp-for="Presupuesto" type="number" step="0.01" class="form-control" />
-        <span asp-validation-for="Presupuesto" class="text-danger"></span>
-    </div>
-    
-    <div class="form-group">
-        <label asp-for="FechaInicio"></label>
-        <input asp-for="FechaInicio" type="date" class="form-control" />
-        <span asp-validation-for="FechaInicio" class="text-danger"></span>
-    </div>
-    
-    <button type="submit" class="btn btn-success">Crear Proyecto</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
-</form>
-```
-
-### Ejemplo 3: Mis Tareas con Botones de Estado
-```html
-@model IEnumerable<Tarea>
-
-<h1>Mis Tareas</h1>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>Descripción</th>
-            <th>Estado</th>
-            <th>Prioridad</th>
-            <th>Fecha Límite</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var tarea in Model)
-        {
-            <tr>
-                <td>@tarea.Descripcion</td>
-                <td>
-                    @if (tarea.Estado == "Pendiente")
-                    {
-                        <span class="badge bg-secondary">Pendiente</span>
-                    }
-                    else if (tarea.Estado == "En Progreso")
-                    {
-                        <span class="badge bg-warning">En Progreso</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-success">Finalizado</span>
-                    }
-                </td>
-                <td>@tarea.Prioridad</td>
-                <td>@tarea.FechaLimite?.ToString("dd/MM/yyyy")</td>
-                <td>
-                    <form asp-action="CambiarEstado" asp-route-id="@tarea.Id" method="post" style="display:inline;">
-                        @Html.AntiForgeryToken()
-                        
+        </thead>
+        <tbody>
+            @foreach (var tarea in Model)
+            {
+                <tr>
+                    <td>@tarea.Descripcion</td>
+                    <td>@tarea.Proyecto?.Nombre</td>
+                    <td>
                         @if (tarea.Estado == "Pendiente")
                         {
-                            <button type="submit" name="nuevoEstado" value="En Progreso" 
-                                    class="btn btn-sm btn-warning">
-                                Iniciar
-                            </button>
+                            <span class="badge bg-secondary">Pendiente</span>
                         }
                         else if (tarea.Estado == "En Progreso")
                         {
-                            <button type="submit" name="nuevoEstado" value="Finalizado" 
-                                    class="btn btn-sm btn-success">
-                                Completar
-                            </button>
+                            <span class="badge bg-warning text-dark">En Progreso</span>
                         }
-                    </form>
-                </td>
+                        else if (tarea.Estado == "Finalizado" || tarea.Estado == "Terminado")
+                        {
+                            <span class="badge bg-success">Finalizado</span>
+                        }
+                    </td>
+                    <td>
+                        @if (tarea.Prioridad == "Alta")
+                        {
+                            <span class="badge bg-danger">Alta</span>
+                        }
+                        else if (tarea.Prioridad == "Media")
+                        {
+                            <span class="badge bg-warning text-dark">Media</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-info">Baja</span>
+                        }
+                    </td>
+                    <td>@tarea.FechaLimite?.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        @* BOTONES DE CAMBIO DE ESTADO *@
+                        <form asp-action="CambiarEstado" asp-route-id="@tarea.Id" method="post" style="display:inline;">
+                            @Html.AntiForgeryToken()
+                            
+                            @if (tarea.Estado == "Pendiente")
+                            {
+                                <button type="submit" name="nuevoEstado" value="En Progreso" 
+                                        class="btn btn-sm btn-warning" title="Iniciar esta tarea">
+                                    <i class="bi bi-play-circle"></i> Iniciar
+                                </button>
+                            }
+                            else if (tarea.Estado == "En Progreso")
+                            {
+                                <button type="submit" name="nuevoEstado" value="Finalizado" 
+                                        class="btn btn-sm btn-success" title="Marcar como completada">
+                                    <i class="bi bi-check-circle"></i> Completar
+                                </button>
+                            }
+                            else
+                            {
+                                <span class="text-success">✓ Completada</span>
+                            }
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info" role="alert">
+            <i class="bi bi-info-circle"></i> No tienes tareas asignadas en este momento.
+        </div>
+    }
+</div>
+```
+
+---
+
+### 🔥 Caso 2: Vista de Reportes (Index.cshtml en Reportes)
+
+```html
+@*
+    VISTA: Index de Reportes
+    QUÉ HACE: Permite seleccionar proyecto y generar reportes PDF/Excel
+    CONTROLADOR: ReportesController.Descargar(tipoReporte, proyectoId) [GET/POST]
+*?
+@model IEnumerable<TechSolutions_program.Models.Proyecto>
+
+<div class="container mt-4">
+    <h1>Generador de Reportes</h1>
+    <hr />
+
+    <div class="alert alert-info" role="alert">
+        <i class="bi bi-info-circle"></i>
+        Selecciona un proyecto para generar su reporte en PDF o Excel.
+    </div>
+
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Proyecto</th>
+                <th>Cliente</th>
+                <th>Estado</th>
+                <th>Presupuesto</th>
+                <th>Reportes</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var proyecto in Model)
+            {
+                <tr>
+                    <td>@proyecto.Nombre</td>
+                    <td>@proyecto.Cliente</td>
+                    <td>@proyecto.Estado</td>
+                    <td>@proyecto.Presupuesto.ToString("C2")</td>
+                    <td>
+                        @* Botón para descargar PDF *@
+                        <a asp-controller="Reportes" 
+                           asp-action="Descargar" 
+                           asp-route-tipoReporte="pdf" 
+                           asp-route-proyectoId="@proyecto.Id" 
+                           class="btn btn-sm btn-danger" 
+                           title="Descargar reporte en PDF">
+                            <i class="bi bi-file-pdf"></i> PDF
+                        </a>
+
+                        @* Botón para descargar Excel *@
+                        <a asp-controller="Reportes" 
+                           asp-action="Descargar" 
+                           asp-route-tipoReporte="excel" 
+                           asp-route-proyectoId="@proyecto.Id" 
+                           class="btn btn-sm btn-success" 
+                           title="Descargar reporte en Excel">
+                            <i class="bi bi-file-excel"></i> Excel
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 ```
 
 ---
 
-## 📊 FLUJO DE DATOS COMPLETO
+### 🔥 Caso 3: Dashboard (Index.cshtml en Seguimiento)
 
-```
-USUARIO                         VISTA                   CONTROLADOR                 SERVICIO                BASE DE DATOS
-   │                              │                          │                          │                          │
-   │ Hace clic en "Mis Tareas"   │                          │                          │                          │
-   │─────────────────────────────>│                          │                          │                          │
-   │                              │ asp-action="MisTareas"   │                          │                          │
-   │                              │─────────────────────────>│                          │                          │
-   │                              │                          │ GetTareasPorResponsable()│                          │
-   │                              │                          │─────────────────────────>│                          │
-   │                              │                          │                          │ SELECT * FROM Tareas... │
-   │                              │                          │                          │────────────────────────>│
-   │                              │                          │                          │<─ Tareas del usuario ───│
-   │                              │                          │<─ Lista de Tareas ───────│                          │
-   │                              │<─ return View(tareas) ───│                          │                          │
-   │<─ Renderiza MisTareas.cshtml │                          │                          │                          │
-   │                              │                          │                          │                          │
-   │ Hace clic en "Completar"    │                          │                          │                          │
-   │─────────────────────────────>│                          │                          │                          │
-   │                              │ POST CambiarEstado       │                          │                          │
-   │                              │─────────────────────────>│                          │                          │
-   │                              │                          │ CambiarEstadoAsync()     │                          │
-   │                              │                          │─────────────────────────>│                          │
-   │                              │                          │                          │ UPDATE Tareas SET...    │
-   │                              │                          │                          │────────────────────────>│
-   │                              │                          │                          │<─ OK ────────────────────│
-   │                              │                          │<─ Task completado ────────│                          │
-   │                              │<─ RedirectToAction() ────│                          │                          │
-   │<─ Recarga MisTareas.cshtml ──│                          │                          │                          │
+```html
+@*
+    VISTA: Dashboard de Seguimiento
+    QUÉ HACE: Muestra métricas e indicadores del sistema
+    CONTROLADOR: SeguimientoController.Index() [GET]
+*?
+@model TechSolutions_program.Models.DashboardViewModel
+
+<div class="container mt-4">
+    <h1>Dashboard de Control</h1>
+    <hr />
+
+    <div class="row">
+        @* Tarjeta 1: Total de Proyectos *@
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Proyectos Activos</h5>
+                    <h2 class="card-text">@Model.TotalProyectos</h2>
+                    <p class="card-text">
+                        <small>Total de proyectos en el sistema</small>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        @* Tarjeta 2: Presupuesto Total *@
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Presupuesto Total</h5>
+                    <h2 class="card-text">S/ @Model.PresupuestoTotal.ToString("N2")</h2>
+                    <p class="card-text">
+                        <small>Suma de todos los proyectos</small>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        @* Tarjeta 3: Tareas Pendientes *@
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">Tareas Pendientes</h5>
+                    <h2 class="card-text">@Model.TareasPendientes</h2>
+                    <p class="card-text">
+                        <small>Tareas sin completar</small>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        @* Tarjeta 4: Tareas Completadas *@
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h5 class="card-title">Tareas Completadas</h5>
+                    <h2 class="card-text">@Model.TareasCompletadas</h2>
+                    <p class="card-text">
+                        <small>Tareas finalizadas</small>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Accesos Rápidos</h4>
+                </div>
+                <div class="card-body">
+                    <a asp-controller="Proyectos" asp-action="Index" class="btn btn-primary">
+                        <i class="bi bi-folder"></i> Ver Proyectos
+                    </a>
+                    
+                    @if (User.IsInRole("Lider"))
+                    {
+                        <a asp-controller="Tareas" asp-action="Index" class="btn btn-info">
+                            <i class="bi bi-list-task"></i> Gestionar Tareas
+                        </a>
+                    }
+                    
+                    @if (User.IsInRole("Desarrollador"))
+                    {
+                        <a asp-controller="Tareas" asp-action="MisTareas" class="btn btn-info">
+                            <i class="bi bi-list-task"></i> Mis Tareas
+                        </a>
+                    }
+                    
+                    <a asp-controller="Reportes" asp-action="Index" class="btn btn-success">
+                        <i class="bi bi-file-earmark-pdf"></i> Reportes
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 ```
 
 ---
 
-## 🆘 PREGUNTAS FRECUENTES
+## 🔧 CONFIGURACIÓN DE REDIRECCIONES DESPUÉS DEL LOGIN
 
-### P: ¿Cuándo usar `asp-action` vs `asp-controller`?
-**R:** 
-- Usa solo `asp-action` cuando estás en la misma controladora (ej: dentro de ClientesController)
-- Usa ambos `asp-controller` y `asp-action` cuando necesitas ir a otra controladora
+### Actualizar el Método Login en AutenticacionController
 
-### P: ¿Por qué algunos métodos son [GET] y otros [POST]?
-**R:**
-- **[GET]**: Para LEER información (mostrar vistas, obtener datos). Se usa en enlaces `<a>`
-- **[POST]**: Para MODIFICAR información (crear, editar, eliminar). Se usa en formularios `<form>`
+Si ves que el login no redirige correctamente, modifica el método así:
 
-### P: ¿Qué hace `@Html.AntiForgeryToken()`?
-**R:** Protege contra ataques CSRF. Es un token de seguridad que valida que el formulario fue enviado desde tu sitio y no desde un sitio malicioso. **SIEMPRE inclúyelo en formularios POST**.
-
-### P: ¿Cómo sé qué parámetros recibe un método del controlador?
-**R:** Mira la firma del método en el controlador:
 ```csharp
-public async Task<IActionResult> Edit(int id, Proyecto proyecto)
+[AllowAnonymous]
+[HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> Login(string email, string password, string? returnUrl = null)
+{
+    if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+    {
+        ModelState.AddModelError(string.Empty, "Intento de inicio de sesión no válido");
+        return View();
+    }
+
+    var user = await _userManager.FindByEmailAsync(email);
+    if (user == null)
+    {
+        ModelState.AddModelError(string.Empty, "Intento de inicio de sesión no válido");
+        return View();
+    }
+
+    var result = await _signInManager.PasswordSignInAsync(user, password, isPersistent: false, lockoutOnFailure: false);
+    if (result.Succeeded)
+    {
+        // Si hay una URL de retorno válida, redirigir ahí
+        if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+        {
+            return LocalRedirect(returnUrl);
+        }
+
+        // Redirigir según el rol del usuario
+        var roles = await _userManager.GetRolesAsync(user);
+        
+        if (roles.Contains("Desarrollador"))
+        {
+            return RedirectToAction("MisTareas", "Tareas");
+        }
+        else if (roles.Contains("Lider") || roles.Contains("Administrador"))
+        {
+            return RedirectToAction("Index", "Proyectos");
+        }
+
+        // Si no tiene rol específico, ir al dashboard
+        return RedirectToAction("Index", "Seguimiento");
+    }
+
+    ModelState.AddModelError(string.Empty, "Intento de inicio de sesión no válido");
+    return View();
+}
 ```
-Necesitas pasar `id` (con `asp-route-id`) y los datos del `proyecto` (desde el formulario con `asp-for`).
-
-### P: ¿Qué es el patrón Strategy en ReportesController?
-**R:** Es un patrón de diseño que permite seleccionar el algoritmo (PDF o Excel) en tiempo de ejecución. El controlador no sabe CÓMO generar el reporte, solo le dice al servicio QUÉ tipo quiere, y el servicio elige la estrategia correcta.
 
 ---
 
-## ✅ CHECKLIST PARA FABRIZZIO
+## 🛠️ ERRORES COMUNES Y SOLUCIONES
 
-Cuando trabajes en una vista, verifica:
+### Error 1: "No existe una estrategia para el tipo solicitado" (Reportes)
 
-- [ ] ¿Agregué `@Html.AntiForgeryToken()` en todos los formularios POST?
-- [ ] ¿Incluí `<input asp-for="Id" type="hidden" />` en formularios de edición?
-- [ ] ¿Los botones de Create/Edit/Delete se muestran solo para los roles correctos?
-- [ ] ¿Los enlaces tienen los parámetros correctos (`asp-route-id`, etc.)?
-- [ ] ¿Agregué validaciones (`asp-validation-for`, `asp-validation-summary`)?
-- [ ] ¿El método que llamo existe en el controlador?
-- [ ] ¿El `asp-action` coincide con el nombre del método?
+**Problema:** Al generar reportes, da error.
+
+**Solución:** Verifica que en `Program.cs` estén registradas las estrategias:
+
+```csharp
+// Registrar estrategias de reportes
+builder.Services.AddTransient<IReporteStrategy, PdfReporteStrategy>();
+builder.Services.AddTransient<IReporteStrategy, ExcelReporteStrategy>();
+builder.Services.AddTransient<IReporteService, ReporteService>();
+```
+
+### Error 2: El método CambiarEstado no funciona
+
+**Problema:** Los botones de cambiar estado no hacen nada.
+
+**Solución:** Asegúrate de que el método existe en TareasController y redirige correctamente:
+
+```csharp
+[Authorize(Roles = "Desarrollador,Lider")]
+[HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> CambiarEstado(int id, string nuevoEstado)
+{
+    if (string.IsNullOrWhiteSpace(nuevoEstado))
+    {
+        ModelState.AddModelError(string.Empty, "Estado no válido.");
+        return RedirectToAction(nameof(MisTareas));
+    }
+
+    try
+    {
+        await _tareaService.CambiarEstadoAsync(id, nuevoEstado);
+        
+        // Redirigir según el rol
+        if (User.IsInRole("Desarrollador"))
+        {
+            return RedirectToAction(nameof(MisTareas));
+        }
+        else
+        {
+            return RedirectToAction(nameof(Index));
+        }
+    }
+    catch (Exception ex)
+    {
+        ModelState.AddModelError(string.Empty, ex.Message);
+        return RedirectToAction(nameof(MisTareas));
+    }
+}
+```
+
+### Error 3: No puedo ver los datos de navegación (proyecto.Tareas)
+
+**Problema:** `@tarea.Proyecto.Nombre` da error o muestra null.
+
+**Solución:** Incluye la navegación en el servicio:
+
+```csharp
+// En TareaService.cs
+public async Task<IEnumerable<Tarea>> GetTareasAsync()
+{
+    return await _dbContext.Tareas
+        .Include(t => t.Proyecto)  // Incluir navegación
+        .AsNoTracking()
+        .ToListAsync();
+}
+```
 
 ---
 
-## 📞 CONTACTO
+## 📝 CHECKLIST RÁPIDO PARA CADA VISTA
 
-Si tienes dudas:
-1. Revisa los comentarios en el código de cada vista (.cshtml)
-2. Revisa los comentarios en el código de cada controlador
-3. Consulta este documento
-4. Pregunta a tu equipo
+Antes de dar por terminada una vista, verifica:
+
+### Para vistas con formularios (Create, Edit, Delete):
+- [ ] ¿Agregué `@Html.AntiForgeryToken()`?
+- [ ] ¿Incluí `<input asp-for="Id" type="hidden" />` en Edit?
+- [ ] ¿Agregué validaciones (`asp-validation-for`)?
+- [ ] ¿El `asp-action` coincide con el nombre del método del controlador?
+- [ ] ¿Probé hacer submit y funciona?
+
+### Para vistas de listado (Index):
+- [ ] ¿Los botones Create/Edit/Delete se muestran solo para los roles correctos?
+- [ ] ¿Los enlaces tienen `asp-route-id="@item.Id"`?
+- [ ] ¿Probé hacer clic en cada botón y funciona?
+
+### Para vistas especiales (MisTareas):
+- [ ] ¿Los botones de CambiarEstado están en un formulario POST?
+- [ ] ¿Incluí `@Html.AntiForgeryToken()`?
+- [ ] ¿El parámetro `name="nuevoEstado"` coincide con el método del controlador?
+- [ ] ¿Probé cambiar el estado y se actualiza correctamente?
 
 ---
 
-**¡Éxito con tu desarrollo, Fabrizzio! 🚀**
+## 🎨 TIPS DE DISEÑO
+
+### Usar Bootstrap Icons
+
+Agrega en `_Layout.cshtml` (en el `<head>`):
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+```
+
+Luego puedes usar iconos:
+- `<i class="bi bi-plus-circle"></i>` → ➕
+- `<i class="bi bi-pencil"></i>` → ✏️
+- `<i class="bi bi-trash"></i>` → 🗑️
+- `<i class="bi bi-eye"></i>` → 👁️
+- `<i class="bi bi-play-circle"></i>` → ▶️
+- `<i class="bi bi-check-circle"></i>` → ✔️
+
+### Colores de Botones Bootstrap
+
+- `btn-primary` → Azul (acciones principales)
+- `btn-success` → Verde (guardar, completar)
+- `btn-danger` → Rojo (eliminar)
+- `btn-warning` → Amarillo (editar, advertencias)
+- `btn-info` → Celeste (ver detalles)
+- `btn-secondary` → Gris (cancelar, volver)
+
+---
+
+## 🚀 ORDEN RECOMENDADO PARA CREAR LAS VISTAS
+
+1. **Login** (Autenticacion/Login.cshtml) ← Ya está hecha
+2. **Home** (Home/Index.cshtml) ← Página de bienvenida
+3. **Clientes:**
+   - Index.cshtml
+   - Create.cshtml
+   - Edit.cshtml
+   - Details.cshtml
+   - Delete.cshtml
+4. **Proyectos:** (mismo orden que Clientes)
+5. **Tareas:**
+   - Index.cshtml (para Líderes)
+   - MisTareas.cshtml (para Desarrolladores) ← CRÍTICA
+   - Create.cshtml
+   - Edit.cshtml
+6. **Dashboard** (Seguimiento/Index.cshtml)
+7. **Reportes** (Reportes/Index.cshtml)
+
+---
+
+## 💡 CONSEJO FINAL
+
+**No te preocupes por hacer todo perfecto desde el inicio.**
+
+1. Empieza con una vista simple que funcione
+2. Prueba que funcione
+3. Si funciona, pasa a la siguiente
+4. Si encuentras un error, arréglalo
+5. No tengas miedo de modificar controladores o servicios
+
+**¡Tú puedes hacerlo, Fabrizzio! 💪**
+
+---
+
+## 📞 NECESITAS AYUDA?
+
+Si algo no funciona:
+1. Lee el mensaje de error completo
+2. Busca en qué línea está el error
+3. Revisa si olvidaste algo del checklist
+4. Verifica que el método del controlador existe
+5. Si es necesario, modifica el controlador o servicio
+
+**¡Mucha suerte! 🍀**
