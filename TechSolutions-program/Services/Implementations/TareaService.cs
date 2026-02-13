@@ -48,7 +48,7 @@ namespace TechSolutions_program.Services.Implementations
         public async Task<IEnumerable<Tarea>> GetTareasPorResponsableAsync(string responsableId)
         {
             return await _dbContext.Tareas.AsNoTracking()
-                .Where(t => t.Responsable == responsableId)
+                .Where(t => t.ResponsableId == responsableId)
                 .ToListAsync();
         }
 

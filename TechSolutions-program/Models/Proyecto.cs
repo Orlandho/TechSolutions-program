@@ -42,11 +42,18 @@ namespace TechSolutions_program.Models
         public string Nombre { get; set; }
 
         /// <summary>
-        /// Identificación del cliente que solicita el proyecto
-        /// Usado en: Filtros y reportes de proyectos por cliente
+        /// Descripción detallada del proyecto
+        /// Usado en: Detalles del proyecto y reportes
+        /// </summary>
+        [StringLength(500)]
+        public string Descripcion { get; set; }
+
+        /// <summary>
+        /// ID del cliente que solicita el proyecto
+        /// Usado en: Relación con la entidad Cliente
         /// </summary>
         [Required(ErrorMessage = "Debe especificar un cliente")]
-        public string Cliente { get; set; }
+        public int ClienteId { get; set; }
 
         /// <summary>
         /// Fecha de inicio del proyecto
@@ -87,6 +94,13 @@ namespace TechSolutions_program.Models
         /// </summary>
         [Required]
         public string Prioridad { get; set; } = "Media";
+
+        /// <summary>
+        /// Navegación al cliente propietario del proyecto
+        /// Usado en: Vistas de detalle para mostrar información del cliente
+        /// </summary>
+        [ForeignKey("ClienteId")]
+        public virtual Cliente Cliente { get; set; }
 
         /// <summary>
         /// Colección de tareas asociadas a este proyecto

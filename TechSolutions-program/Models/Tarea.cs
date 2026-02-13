@@ -58,7 +58,7 @@ namespace TechSolutions_program.Models
         /// ID del usuario (desarrollador) responsable de la tarea
         /// Usado en: Filtro de MisTareas para mostrar solo las tareas del usuario actual
         /// </summary>
-        public string Responsable { get; set; }
+        public string ResponsableId { get; set; }
 
         /// <summary>
         /// Fecha límite para completar la tarea

@@ -8,7 +8,7 @@
  * FECHA: 2026-02-##
  * ====================================================================================
  */
-
+ 
 -- 1. Creación de la Base de Datos
 -- Verificamos si existe para no dar error, si no existe la crea.
 IF NOT EXISTS(SELECT * FROM sys.databases WHERE name = 'TechSolutionsDB')

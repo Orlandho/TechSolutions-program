@@ -37,7 +37,7 @@ namespace TechSolutions_program.Models
         /// </summary>
         [Required]
         [EmailAddress(ErrorMessage = "Ingrese un correo válido")]
-        public string CorreoContacto { get; set; }
+        public string EmailContacto { get; set; }
 
         /// <summary>
         /// Número de teléfono de contacto

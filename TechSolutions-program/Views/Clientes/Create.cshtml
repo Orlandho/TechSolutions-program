@@ -1,92 +1,52 @@
 @model TechSolutions_program.Models.Cliente
 
-<h1>Crear Cliente</h1>
+@{
+    ViewData["Title"] = "Crear cliente";
+}
 
-@*
-    ====================================================================================
-    VISTA: CREATE DE CLIENTES - FORMULARIO DE CREACIÓN
-    ====================================================================================
-    MÉTODOS DEL CONTROLADOR QUE USA ESTA VISTA:
-    
-    1. ClientesController.Create() [GET]
-       - Este método muestra esta vista vacía para que el usuario llene el formulario
-       - Se accede desde: <a asp-action="Create">Nuevo Cliente</a>
-    
-    MÉTODOS QUE DEBES USAR EN ESTA VISTA:
-    
-    2. ClientesController.Create() [POST]
-       - Este método procesa el formulario cuando el usuario hace submit
-       - Usa: <form asp-action="Create" method="post">
-       - Incluye SIEMPRE: @Html.AntiForgeryToken() o asp-antiforgery="true"
-       - El botón submit debe estar DENTRO del form:
-         <button type="submit" class="btn btn-success">Guardar Cliente</button>
-    
-    3. ClientesController.Index() [GET]
-       - Para el botón "Volver al listado"
-       - Usa: <a asp-action="Index" class="btn btn-secondary">Volver</a>
-       - Regresa a la lista de clientes sin guardar
-    
-    CAMPOS QUE DEBE TENER EL FORMULARIO:
-    - RazonSocial: <input asp-for="RazonSocial" class="form-control" />
-    - RUC: <input asp-for="RUC" class="form-control" />
-    - CorreoContacto: <input asp-for="CorreoContacto" class="form-control" />
-    - Telefono: <input asp-for="Telefono" class="form-control" />
-    - Direccion: <input asp-for="Direccion" class="form-control" />
-    
-    POR QUÉ USAR ESTOS MÉTODOS AQUÍ:
-    - asp-action="Create" en el form hace que al presionar submit se llame a Create[POST]
-    - Create[POST] valida y guarda el nuevo cliente en la base de datos
-    - Si hay errores de validación, muestra esta misma vista con los errores
-    - Si todo es correcto, redirige a Index para ver el listado actualizado
-    ====================================================================================
-*@
+<h1 class="h3">Crear cliente</h1>
 
-<div>
-    <form asp-action="Create" method="post">
-        <!-- Protección contra ataques CSRF -->
-        @Html.AntiForgeryToken()
+<form asp-action="Create" method="post" class="mt-4">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-        <div class="form-group">
-            <label asp-for="RazonSocial"></label>
-            <input asp-for="RazonSocial" class="form-control" />
-            <span asp-validation-for="RazonSocial" class="text-danger"></span>
-        </div>
+    <div class="mb-3">
+        <label asp-for="RazonSocial" class="form-label"></label>
+        <input asp-for="RazonSocial" class="form-control" />
+        <span asp-validation-for="RazonSocial" class="text-danger"></span>
+    </div>
 
-        <div class="form-group">
-            <label asp-for="RUC"></label>
-            <input asp-for="RUC" class="form-control" />
-            <span asp-validation-for="RUC" class="text-danger"></span>
-        </div>
+    <div class="mb-3">
+        <label asp-for="RUC" class="form-label"></label>
+        <input asp-for="RUC" class="form-control" />
+        <span asp-validation-for="RUC" class="text-danger"></span>
+    </div>
 
-        <div class="form-group">
-            <label asp-for="CorreoContacto"></label>
-            <input asp-for="CorreoContacto" class="form-control" />
-            <span asp-validation-for="CorreoContacto" class="text-danger"></span>
-        </div>
+    <div class="mb-3">
+        <label asp-for="EmailContacto" class="form-label"></label>
+        <input asp-for="EmailContacto" class="form-control" />
+        <span asp-validation-for="EmailContacto" class="text-danger"></span>
+    </div>
 
-        <div class="form-group">
-            <label asp-for="Telefono"></label>
-            <input asp-for="Telefono" class="form-control" />
-            <span asp-validation-for="Telefono" class="text-danger"></span>
-        </div>
+    <div class="mb-3">
+        <label asp-for="Telefono" class="form-label"></label>
+        <input asp-for="Telefono" class="form-control" />
+        <span asp-validation-for="Telefono" class="text-danger"></span>
+    </div>
 
-        <div class="form-group">
-            <label asp-for="Direccion"></label>
-            <input asp-for="Direccion" class="form-control" />
-            <span asp-validation-for="Direccion" class="text-danger"></span>
-        </div>
+    <div class="mb-3">
+        <label asp-for="Direccion" class="form-label"></label>
+        <input asp-for="Direccion" class="form-control" />
+        <span asp-validation-for="Direccion" class="text-danger"></span>
+    </div>
 
-        <!-- Botón para guardar el cliente -->
-        <button type="submit" class="btn btn-success">Guardar Cliente</button>
-    </form>
-</div>
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-success">Guardar</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </div>
+</form>
 
-<!-- Botón para volver a la lista de clientes -->
-<div>
-    <a asp-action="Index" class="btn btn-secondary">Volver</a>
-</div>
-
-<!-- Scripts de validación de cliente -->
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+

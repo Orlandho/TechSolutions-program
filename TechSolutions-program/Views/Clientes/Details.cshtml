@@ -1,67 +1,35 @@
 @model TechSolutions_program.Models.Cliente
 
-@*
-    ====================================================================================
-    VISTA: DETAILS DE CLIENTES - VISUALIZACIÓN DETALLADA
-    ====================================================================================
-    MÉTODOS DEL CONTROLADOR QUE USA ESTA VISTA:
-    
-    1. ClientesController.Details(int id) [GET]
-       - Este método carga el cliente y muestra esta vista con toda su información
-       - Se accede desde: <a asp-action="Details" asp-route-id="@cliente.Id">Ver Detalles</a>
-    
-    MÉTODOS QUE DEBES USAR EN ESTA VISTA:
-    
-    2. ClientesController.Edit(int id) [GET]
-       - Para el botón "Editar"
-       - Usa: <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Editar</a>
-       - Permite modificar este cliente
-    
-    3. ClientesController.Delete(int id) [GET]
-       - Para el botón "Eliminar"
-       - Usa: <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Eliminar</a>
-       - Inicia el proceso de eliminación
-    
-    4. ClientesController.Index() [GET]
-       - Para el botón "Volver al listado"
-       - Usa: <a asp-action="Index" class="btn btn-secondary">Volver</a>
-       - Regresa a la lista de clientes
-    
-    LO QUE DEBE MOSTRAR ESTA VISTA:
-    - Muestra TODOS los datos del cliente de forma SOLO LECTURA
-    - NO usa formularios ni inputs, solo muestra información
-    - Usa: @Model.RazonSocial, @Model.RUC, @Model.CorreoContacto, etc.
-    - Puede incluir etiquetas HTML como <dl>, <dt>, <dd> para organizar
-    
-    POR QUÉ USAR ESTOS MÉTODOS AQUÍ:
-    - Esta es una vista de CONSULTA/LECTURA únicamente
-    - No hay formularios, solo se muestra información
-    - Los botones permiten navegar a otras acciones (Editar, Eliminar, Volver)
-    - @Model contiene el objeto Cliente con todos sus datos cargados desde la BD
-    ====================================================================================
-*@
+@{
+    ViewData["Title"] = "Detalle de cliente";
+}
 
-<h1>Detalle de Cliente</h1>
+<h1 class="h3">Detalle de cliente</h1>
 
-<dl class="row">
-    <dt class="col-sm-2">Razón Social</dt>
-    <dd class="col-sm-10">@Model.RazonSocial</dd>
+<div class="card mt-3">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Razón social</dt>
+            <dd class="col-sm-9">@Model.RazonSocial</dd>
 
-    <dt class="col-sm-2">RUC</dt>
-    <dd class="col-sm-10">@Model.RUC</dd>
+            <dt class="col-sm-3">RUC</dt>
+            <dd class="col-sm-9">@Model.RUC</dd>
 
-    <dt class="col-sm-2">Correo de Contacto</dt>
-    <dd class="col-sm-10">@Model.CorreoContacto</dd>
+            <dt class="col-sm-3">Correo</dt>
+            <dd class="col-sm-9">@Model.EmailContacto</dd>
 
-    <dt class="col-sm-2">Teléfono</dt>
-    <dd class="col-sm-10">@Model.Telefono</dd>
+            <dt class="col-sm-3">Teléfono</dt>
+            <dd class="col-sm-9">@Model.Telefono</dd>
 
-    <dt class="col-sm-2">Dirección</dt>
-    <dd class="col-sm-10">@Model.Direccion</dd>
-</dl>
+            <dt class="col-sm-3">Dirección</dt>
+            <dd class="col-sm-9">@Model.Direccion</dd>
+        </dl>
+    </div>
+</div>
 
-<div class="form-group">
-    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Editar</a>
-    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Eliminar</a>
+<div class="d-flex gap-2 mt-3">
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-warning">Editar</a>
+    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">Eliminar</a>
     <a asp-action="Index" class="btn btn-secondary">Volver</a>
 </div>
+

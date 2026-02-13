@@ -1,97 +1,45 @@
-@*
-    ====================================================================================
-    VISTA: DETAILS DE PROYECTOS - VISUALIZACIÓN DETALLADA
-    ====================================================================================
-    SEGURIDAD: Accesible para todos los usuarios autenticados
-    
-    MÉTODOS DEL CONTROLADOR QUE USA ESTA VISTA:
-    
-    1. ProyectosController.Details(int id) [GET]
-       - Este método carga el proyecto y muestra esta vista con toda su información
-       - Se accede desde: <a asp-action="Details" asp-route-id="@proyecto.Id">Ver Detalles</a>
-       - Llama a ProyectoService.GetByIdAsync(id)
-    
-    MÉTODOS QUE DEBES USAR EN ESTA VISTA:
-    
-    2. ProyectosController.Edit(int id) [GET]
-       - Para el botón "Editar" (SOLO visible para Líder/Administrador)
-       - Usa: <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Editar</a>
-       - Permite modificar este proyecto
-    
-    3. ProyectosController.Delete(int id) [GET]
-       - Para el botón "Eliminar" (SOLO visible para Líder/Administrador)
-       - Usa: <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Eliminar</a>
-       - Inicia el proceso de eliminación
-    
-    4. ProyectosController.Index() [GET]
-       - Para el botón "Volver al listado"
-       - Usa: <a asp-action="Index" class="btn btn-secondary">Volver</a>
-       - Regresa a la lista de proyectos
-    
-    5. ReportesController.Descargar(string tipoReporte, int proyectoId) [GET/POST]
-       - Para botones de descarga de reportes
-       - Usa: <a asp-controller="Reportes" asp-action="Descargar" 
-                  asp-route-tipoReporte="pdf" asp-route-proyectoId="@Model.Id" 
-                  class="btn btn-info">Descargar PDF</a>
-       - Usa: <a asp-controller="Reportes" asp-action="Descargar" 
-                  asp-route-tipoReporte="excel" asp-route-proyectoId="@Model.Id" 
-                  class="btn btn-success">Descargar Excel</a>
-    
-    LO QUE DEBE MOSTRAR ESTA VISTA:
-    - Muestra TODOS los datos del proyecto de forma SOLO LECTURA
-    - NO usa formularios, solo muestra información
-    - Datos a mostrar: @Model.Nombre, @Model.Cliente, @Model.Presupuesto, 
-      @Model.FechaInicio, @Model.FechaFinEstimada, @Model.Estado, @Model.Prioridad
-    - Si hay tareas asociadas (@Model.Tareas), mostrar un listado de ellas
-    
-    POR QUÉ USAR ESTOS MÉTODOS AQUÍ:
-    - Esta es una vista de CONSULTA/LECTURA únicamente
-    - Los Desarrolladores pueden ver los detalles pero no modificar
-    - Los botones de Editar/Eliminar deben mostrarse solo si el usuario es Líder/Administrador
-    - Los reportes permiten exportar la información del proyecto a PDF o Excel
-    ====================================================================================
-*@
 @model TechSolutions_program.Models.Proyecto
 
-<h1>Detalle de Proyecto</h1>
+@{
+    ViewData["Title"] = "Detalle de proyecto";
+}
 
-<div>
-    <h2>@Model.Nombre</h2>
-    <p><strong>Cliente:</strong> @Model.Cliente</p>
-    <p><strong>Presupuesto:</strong> @Model.Presupuesto</p>
-    <p><strong>Fecha de Inicio:</strong> @Model.FechaInicio.ToString("dd/MM/yyyy")</p>
-    <p><strong>Fecha Fin Estimada:</strong> @Model.FechaFinEstimada.ToString("dd/MM/yyyy")</p>
-    <p><strong>Estado:</strong> @Model.Estado</p>
-    <p><strong>Prioridad:</strong> @Model.Prioridad</p>
+<h1 class="h3">Detalle de proyecto</h1>
+
+<div class="card mt-3">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Proyecto</dt>
+            <dd class="col-sm-9">@Model.Nombre</dd>
+
+            <dt class="col-sm-3">Cliente</dt>
+            <dd class="col-sm-9">@Model.Cliente</dd>
+
+            <dt class="col-sm-3">Estado</dt>
+            <dd class="col-sm-9">@Model.Estado</dd>
+
+            <dt class="col-sm-3">Prioridad</dt>
+            <dd class="col-sm-9">@Model.Prioridad</dd>
+
+            <dt class="col-sm-3">Presupuesto</dt>
+            <dd class="col-sm-9">@Model.Presupuesto.ToString("C2")</dd>
+
+            <dt class="col-sm-3">Inicio</dt>
+            <dd class="col-sm-9">@Model.FechaInicio.ToString("dd/MM/yyyy")</dd>
+
+            <dt class="col-sm-3">Fin estimado</dt>
+            <dd class="col-sm-9">@Model.FechaFinEstimada.ToString("dd/MM/yyyy")</dd>
+        </dl>
+    </div>
 </div>
 
-<hr />
-
-<h3>Tareas Asociadas</h3>
-@if (Model.Tareas != null && Model.Tareas.Any())
-{
-    <ul>
-    @foreach (var tarea in Model.Tareas)
-    {
-        <li>@tarea.Nombre - @(tarea.Completada ? "Completada" : "Pendiente")</li>
-    }
-    </ul>
-}
-else
-{
-    <p>No hay tareas asociadas a este proyecto.</p>
-}
-
-<hr />
-
-<div>
-    @* Botones de acción *@
-    <a asp-action="Index" class="btn btn-secondary">Volver</a>
+<div class="d-flex gap-2 mt-3">
     @if (User.IsInRole("Lider") || User.IsInRole("Administrador"))
     {
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Editar</a>
-        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Eliminar</a>
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-warning">Editar</a>
+        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">Eliminar</a>
     }
-    <a asp-controller="Reportes" asp-action="Descargar" asp-route-tipoReporte="pdf" asp-route-proyectoId="@Model.Id" class="btn btn-info">Descargar PDF</a>
-    <a asp-controller="Reportes" asp-action="Descargar" asp-route-tipoReporte="excel" asp-route-proyectoId="@Model.Id" class="btn btn-success">Descargar Excel</a>
+    <a asp-controller="Reportes" asp-action="Descargar" asp-route-tipoReporte="pdf" asp-route-proyectoId="@Model.Id" class="btn btn-outline-secondary">PDF</a>
+    <a asp-controller="Reportes" asp-action="Descargar" asp-route-tipoReporte="excel" asp-route-proyectoId="@Model.Id" class="btn btn-outline-success">Excel</a>
+    <a asp-action="Index" class="btn btn-secondary">Volver</a>
 </div>
