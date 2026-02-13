@@ -1,3 +1,113 @@
 @model TechSolutions_program.Models.Tarea
 
 <h1>Crear Tarea</h1>
+
+@*
+    ====================================================================================
+    VISTA: CREATE DE TAREAS - FORMULARIO DE CREACIÓN
+    ====================================================================================
+    SEGURIDAD: Solo accesible para rol Líder
+    
+    MÉTODOS DEL CONTROLADOR QUE USA ESTA VISTA:
+    
+    1. TareasController.Create() [GET]
+       - Este método muestra esta vista vacía (requiere rol Líder)
+       - Se accede desde: <a asp-action="Create">Nueva Tarea</a>
+    
+    MÉTODOS QUE DEBES USAR EN ESTA VISTA:
+    
+    2. TareasController.Create(Tarea tarea) [POST]
+       - Este método procesa el formulario cuando el Líder hace submit
+       - Usa: <form asp-action="Create" method="post">
+       - Incluye SIEMPRE: @Html.AntiForgeryToken() o asp-antiforgery="true"
+       - Llama a TareaService.CrearAsync(tarea)
+       - El botón submit:
+         <button type="submit" class="btn btn-success">Crear Tarea</button>
+    
+    3. TareasController.Index() [GET]
+       - Para el botón "Cancelar"
+       - Usa: <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+       - Regresa a la lista de tareas
+    
+    CAMPOS QUE DEBE TENER EL FORMULARIO:
+    - Descripcion: <textarea asp-for="Descripcion" class="form-control" required></textarea>
+    - Estado: <select asp-for="Estado" class="form-control">
+                <option value="Pendiente">Pendiente</option>
+                <option value="En Progreso">En Progreso</option>
+                <option value="Terminado">Terminado</option>
+              </select>
+    - Prioridad: <select asp-for="Prioridad" class="form-control">
+                   <option value="Baja">Baja</option>
+                   <option value="Media">Media</option>
+                   <option value="Alta">Alta</option>
+                 </select>
+    - Responsable: <input asp-for="Responsable" class="form-control" />
+                   (ID del desarrollador asignado)
+    - FechaLimite: <input asp-for="FechaLimite" type="date" class="form-control" />
+    - ProyectoId: <select asp-for="ProyectoId" class="form-control" required>
+                    <!-- Aquí debes cargar la lista de proyectos desde ViewBag/ViewData -->
+                  </select>
+    - Validaciones: <span asp-validation-for="Descripcion" class="text-danger"></span>
+    
+    POR QUÉ USAR ESTOS MÉTODOS AQUÍ:
+    - Solo el Líder puede crear tareas y asignarlas a desarrolladores
+    - Create[POST] valida y guarda la nueva tarea en la base de datos
+    - El campo ProyectoId es OBLIGATORIO (cada tarea debe pertenecer a un proyecto)
+    - El campo Responsable especifica qué desarrollador hará la tarea
+    - Si hay errores de validación, muestra esta vista con los errores
+    - Si todo es correcto, redirige a Index para ver el listado actualizado
+    ====================================================================================
+*@
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+    
+    <div class="form-group">
+        <label asp-for="Descripcion"></label>
+        <textarea asp-for="Descripcion" class="form-control" required></textarea>
+        <span asp-validation-for="Descripcion" class="text-danger"></span>
+    </div>
+    
+    <div class="form-group">
+        <label asp-for="Estado"></label>
+        <select asp-for="Estado" class="form-control">
+            <option value="Pendiente">Pendiente</option>
+            <option value="En Progreso">En Progreso</option>
+            <option value="Terminado">Terminado</option>
+        </select>
+    </div>
+    
+    <div class="form-group">
+        <label asp-for="Prioridad"></label>
+        <select asp-for="Prioridad" class="form-control">
+            <option value="Baja">Baja</option>
+            <option value="Media">Media</option>
+            <option value="Alta">Alta</option>
+        </select>
+    </div>
+    
+    <div class="form-group">
+        <label asp-for="Responsable"></label>
+        <input asp-for="Responsable" class="form-control" />
+        <small class="form-text text-muted">ID del desarrollador asignado</small>
+    </div>
+    
+    <div class="form-group">
+        <label asp-for="FechaLimite"></label>
+        <input asp-for="FechaLimite" type="date" class="form-control" />
+    </div>
+    
+    <div class="form-group">
+        <label asp-for="ProyectoId"></label>
+        <select asp-for="ProyectoId" class="form-control" required>
+            <!-- Aquí debes cargar la lista de proyectos desde ViewBag/ViewData -->
+        </select>
+    </div>
+    
+    <button type="submit" class="btn btn-success">Crear Tarea</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

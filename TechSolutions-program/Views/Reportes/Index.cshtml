@@ -1,3 +1,69 @@
 @model IEnumerable<TechSolutions_program.Models.Reporte>
 
 <h1>Generador de Reportes</h1>
+
+@*
+    ====================================================================================
+    VISTA: REPORTES - GENERACIÓN Y DESCARGA DE REPORTES
+    ====================================================================================
+    SEGURIDAD: Accesible para todos los usuarios autenticados
+    
+    MÉTODOS DEL CONTROLADOR QUE USA ESTA VISTA:
+    
+    1. ReportesController.Index() [GET]
+       - Este método muestra esta vista con opciones de generación de reportes
+       - Se accede con: <a asp-controller="Reportes" asp-action="Index">Reportes</a>
+    
+    MÉTODOS QUE DEBES USAR EN ESTA VISTA:
+    
+    2. ReportesController.Descargar(string tipoReporte, int proyectoId) [GET/POST]
+       - Este método genera y descarga un reporte en formato PDF o Excel
+       - Es el método MÁS IMPORTANTE de esta vista
+       - Para generar PDF:
+         <a asp-action="Descargar" 
+            asp-route-tipoReporte="pdf" 
+            asp-route-proyectoId="@proyecto.Id" 
+            class="btn btn-danger">
+           <i class="fa fa-file-pdf"></i> Descargar PDF
+         </a>
+       
+       - Para generar Excel:
+         <a asp-action="Descargar" 
+            asp-route-tipoReporte="excel" 
+            asp-route-proyectoId="@proyecto.Id" 
+            class="btn btn-success">
+           <i class="fa fa-file-excel"></i> Descargar Excel
+         </a>
+       
+       - Llama a ReporteService.GenerarAsync(tipoReporte, proyectoId)
+       - El servicio usa el PATRÓN STRATEGY para seleccionar PDF o Excel
+       - Devuelve un archivo para descargar directamente
+    
+    PARÁMETROS IMPORTANTES:
+    - tipoReporte: Debe ser "pdf" o "excel" (case-insensitive)
+    - proyectoId: ID del proyecto del cual se quiere generar el reporte
+    
+    CÓMO FUNCIONA INTERNAMENTE (para que Fabrizzio entienda):
+    1. Usuario hace clic en "Descargar PDF" o "Descargar Excel"
+    2. El navegador llama a ReportesController.Descargar(tipoReporte, proyectoId)
+    3. El controlador llama a ReporteService.GenerarAsync(tipoReporte, proyectoId)
+    4. El servicio usa el patrón Strategy:
+       - Si tipoReporte es "pdf": usa PdfReporteStrategy
+       - Si tipoReporte es "excel": usa ExcelReporteStrategy
+    5. La estrategia genera el archivo (PDF o Excel) con los datos del proyecto
+    6. El controlador devuelve el archivo como FileResult
+    7. El navegador muestra el diálogo de descarga al usuario
+    
+    DATOS QUE SE PUEDEN INCLUIR EN EL REPORTE:
+    - Información del proyecto: Nombre, Cliente, Presupuesto, Fechas
+    - Lista de tareas del proyecto: Descripción, Estado, Responsable, Fecha Límite
+    - Resumen de avance: Tareas completadas vs pendientes
+    
+    POR QUÉ USAR ESTE MÉTODO AQUÍ:
+    - Esta vista permite a los usuarios exportar información de proyectos
+    - Los reportes PDF son útiles para presentaciones y documentación
+    - Los reportes Excel son útiles para análisis de datos
+    - El patrón Strategy permite agregar nuevos formatos fácilmente
+      (por ejemplo: Word, CSV) sin modificar el código existente
+    ====================================================================================
+*@

@@ -1,15 +1,66 @@
+@*
+    ====================================================================================
+    VISTA: LOGIN - INICIO DE SESIÓN
+    ====================================================================================
+    SEGURIDAD: Accesible para usuarios no autenticados ([AllowAnonymous])
+    
+    MÉTODOS DEL CONTROLADOR QUE USA ESTA VISTA:
+    
+    1. AutenticacionController.Login(string returnUrl) [GET]
+       - Este método muestra esta vista (el formulario de login)
+       - Se accede con: <a asp-controller="Autenticacion" asp-action="Login">Iniciar Sesión</a>
+       - Puede recibir un parámetro returnUrl para redirigir después del login
+    
+    MÉTODOS QUE DEBES USAR EN ESTA VISTA:
+    
+    2. AutenticacionController.Login(string email, string password, string returnUrl) [POST]
+       - Este método procesa el intento de inicio de sesión
+       - ESTE FORMULARIO YA ESTÁ CONFIGURADO CORRECTAMENTE con asp-action="Login"
+       - Incluye SIEMPRE: @Html.AntiForgeryToken() (AGRÉGALO al formulario existente)
+       - Valida las credenciales usando SignInManager de ASP.NET Core Identity
+       - Si login exitoso: redirige a returnUrl o a /Proyectos/Index
+       - Si login falla: muestra error "Intento de inicio de sesión no válido"
+    
+    CAMPOS REQUERIDOS EN EL FORMULARIO (YA PRESENTES):
+    - email: <input name="email" type="email" required />
+      * Debe coincidir con un usuario en la base de datos
+    - password: <input name="password" type="password" required />
+      * Se valida contra el hash almacenado en la BD
+    - returnUrl (opcional): <input name="returnUrl" type="hidden" value="@ViewData["ReturnUrl"]" />
+      * Si el usuario intentó acceder a una página protegida, regresa ahí después del login
+    
+    AGREGAR AL FORMULARIO:
+    - @Html.AntiForgeryToken() - Protección contra ataques CSRF
+    - <div asp-validation-summary="ModelOnly" class="text-danger"></div> - Muestra errores
+    
+    POR QUÉ USAR ESTOS MÉTODOS AQUÍ:
+    - Login[GET] muestra el formulario vacío
+    - Login[POST] valida las credenciales:
+      1. Busca el usuario por email con UserManager.FindByEmailAsync()
+      2. Valida la contraseña con SignInManager.PasswordSignInAsync()
+      3. Si es exitoso, crea una cookie de autenticación
+      4. El usuario autenticado puede acceder a las páginas protegidas con [Authorize]
+    - Los errores son genéricos ("Intento de inicio de sesión no válido") por seguridad
+      (no revela si el email existe o la contraseña es incorrecta)
+    ====================================================================================
+*@
 @model dynamic
 
 <h1>Iniciar sesión</h1>
 
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
 <form asp-action="Login" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+    
     <div>
         <label for="email">Email</label>
-        <input id="email" name="email" type="email" />
+        <input id="email" name="email" type="email" required />
     </div>
     <div>
         <label for="password">Password</label>
-        <input id="password" name="password" type="password" />
+        <input id="password" name="password" type="password" required />
     </div>
     <div>
         <button type="submit">Ingresar</button>

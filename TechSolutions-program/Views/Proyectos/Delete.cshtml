@@ -1,3 +1,72 @@
 @model TechSolutions_program.Models.Proyecto
 
+@*
+    ====================================================================================
+    VISTA: DELETE DE PROYECTOS - CONFIRMACIÓN DE ELIMINACIÓN
+    ====================================================================================
+    SEGURIDAD: Solo accesible para roles Líder y Administrador
+    
+    MÉTODOS DEL CONTROLADOR QUE USA ESTA VISTA:
+    
+    1. ProyectosController.Delete(int id) [GET]
+       - Este método carga el proyecto y muestra esta vista de confirmación
+       - Se accede desde: <a asp-action="Delete" asp-route-id="@proyecto.Id">Eliminar</a>
+       - Llama a ProyectoService.GetByIdAsync(id) para obtener los datos
+    
+    MÉTODOS QUE DEBES USAR EN ESTA VISTA:
+    
+    2. ProyectosController.DeleteConfirmed(int id) [POST]
+       - Este método elimina el proyecto de la base de datos
+       - Usa: <form asp-action="Delete" method="post">
+       - IMPORTANTE: El action name es "Delete" aunque el método se llama DeleteConfirmed
+       - Incluye SIEMPRE: @Html.AntiForgeryToken() o asp-antiforgery="true"
+       - Llama a ProyectoService.EliminarAsync(id)
+       - El botón de confirmación:
+         <button type="submit" class="btn btn-danger">Confirmar Eliminación</button>
+    
+    3. ProyectosController.Index() [GET]
+       - Para el botón "Cancelar"
+       - Usa: <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+       - Regresa a la lista sin eliminar
+    
+    LO QUE DEBE MOSTRAR ESTA VISTA:
+    - Muestra los datos del proyecto de forma SOLO LECTURA (sin inputs editables)
+    - Un mensaje de advertencia: "¿Está seguro que desea eliminar este proyecto?"
+    - Muestra: @Model.Nombre, @Model.Cliente, @Model.Presupuesto, @Model.FechaInicio, etc.
+    - ADVERTENCIA: "Esta acción eliminará también todas las tareas asociadas"
+    
+    POR QUÉ USAR ESTOS MÉTODOS AQUÍ:
+    - Esta es una vista de CONFIRMACIÓN, no permite editar
+    - Delete[GET] muestra los datos para que el usuario confirme qué va a eliminar
+    - Delete[POST] (DeleteConfirmed) realiza la eliminación PERMANENTE
+    - Eliminar un proyecto puede afectar las tareas asociadas (eliminación en cascada)
+    - Esta doble confirmación previene eliminaciones accidentales costosas
+    - Una vez eliminado, redirige a Index
+    ====================================================================================
+*@
+
 <h1>Eliminar Proyecto</h1>
+
+<p>¿Está seguro que desea eliminar este proyecto?</p>
+<div>
+    <h4>Proyecto</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">Nombre</dt>
+        <dd class="col-sm-10">@Model.Nombre</dd>
+        <dt class="col-sm-2">Cliente</dt>
+        <dd class="col-sm-10">@Model.Cliente</dd>
+        <dt class="col-sm-2">Presupuesto</dt>
+        <dd class="col-sm-10">@Model.Presupuesto</dd>
+        <dt class="col-sm-2">Fecha de Inicio</dt>
+        <dd class="col-sm-10">@Model.FechaInicio.ToString("D")</dd>
+    </dl>
+</div>
+
+@using (Html.BeginForm("Delete", "Proyectos", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" value="@Model.Id" />
+    <button type="submit" class="btn btn-danger">Confirmar Eliminación</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+}

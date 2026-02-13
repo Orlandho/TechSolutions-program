@@ -1,3 +1,107 @@
 @model TechSolutions_program.Models.Proyecto
 
+@*
+    ====================================================================================
+    VISTA: CREATE DE PROYECTOS - FORMULARIO DE CREACIÓN
+    ====================================================================================
+    SEGURIDAD: Solo accesible para roles Líder y Administrador
+    
+    MÉTODOS DEL CONTROLADOR QUE USA ESTA VISTA:
+    
+    1. ProyectosController.Create() [GET]
+       - Este método muestra esta vista vacía (requiere rol Líder/Administrador)
+       - Se accede desde: <a asp-action="Create">Nuevo Proyecto</a>
+    
+    MÉTODOS QUE DEBES USAR EN ESTA VISTA:
+    
+    2. ProyectosController.Create(Proyecto proyecto) [POST]
+       - Este método procesa el formulario cuando el usuario hace submit
+       - Usa: <form asp-action="Create" method="post">
+       - Incluye SIEMPRE: @Html.AntiForgeryToken() o asp-antiforgery="true"
+       - Llama a ProyectoService.CrearAsync() que valida reglas de negocio
+       - El botón submit:
+         <button type="submit" class="btn btn-success">Crear Proyecto</button>
+    
+    3. ProyectosController.Index() [GET]
+       - Para el botón "Cancelar"
+       - Usa: <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+       - Regresa a la lista sin crear
+    
+    CAMPOS QUE DEBE TENER EL FORMULARIO:
+    - Nombre: <input asp-for="Nombre" class="form-control" required />
+    - Cliente: <input asp-for="Cliente" class="form-control" required />
+    - FechaInicio: <input asp-for="FechaInicio" type="date" class="form-control" required />
+    - FechaFinEstimada: <input asp-for="FechaFinEstimada" type="date" class="form-control" />
+    - Presupuesto: <input asp-for="Presupuesto" type="number" step="0.01" class="form-control" required />
+    - Estado: <select asp-for="Estado" class="form-control">
+                <option value="Planificación">Planificación</option>
+                <option value="En Desarrollo">En Desarrollo</option>
+                <option value="Finalizado">Finalizado</option>
+              </select>
+    - Prioridad: <select asp-for="Prioridad" class="form-control">
+                   <option value="Baja">Baja</option>
+                   <option value="Media">Media</option>
+                   <option value="Alta">Alta</option>
+                 </select>
+    - Validaciones: <span asp-validation-for="Nombre" class="text-danger"></span>
+    
+    POR QUÉ USAR ESTOS MÉTODOS AQUÍ:
+    - Create[POST] valida reglas de negocio: presupuesto > 0, FechaFin > FechaInicio
+    - Si hay errores de validación, muestra esta vista con los errores
+    - Si todo es correcto, llama a ProyectoService.CrearAsync() para guardar en BD
+    - Después redirige a Index para ver el listado actualizado
+    ====================================================================================
+*@
+
 <h1>Crear Proyecto</h1>
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+    <div class="mb-3">
+        <label asp-for="Nombre" class="form-label"></label>
+        <input asp-for="Nombre" class="form-control" required />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Cliente" class="form-label"></label>
+        <input asp-for="Cliente" class="form-control" required />
+        <span asp-validation-for="Cliente" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="FechaInicio" class="form-label"></label>
+        <input asp-for="FechaInicio" type="date" class="form-control" required />
+        <span asp-validation-for="FechaInicio" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="FechaFinEstimada" class="form-label"></label>
+        <input asp-for="FechaFinEstimada" type="date" class="form-control" />
+        <span asp-validation-for="FechaFinEstimada" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Presupuesto" class="form-label"></label>
+        <input asp-for="Presupuesto" type="number" step="0.01" class="form-control" required />
+        <span asp-validation-for="Presupuesto" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Estado" class="form-label"></label>
+        <select asp-for="Estado" class="form-control">
+            <option value="Planificación">Planificación</option>
+            <option value="En Desarrollo">En Desarrollo</option>
+            <option value="Finalizado">Finalizado</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Prioridad" class="form-label"></label>
+        <select asp-for="Prioridad" class="form-control">
+            <option value="Baja">Baja</option>
+            <option value="Media">Media</option>
+            <option value="Alta">Alta</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-success">Crear Proyecto</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

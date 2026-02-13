@@ -1,3 +1,89 @@
+@*
+    ====================================================================================
+    VISTA: EDIT DE CLIENTES - FORMULARIO DE EDICIÓN
+    ====================================================================================
+    MÉTODOS DEL CONTROLADOR QUE USA ESTA VISTA:
+    
+    1. ClientesController.Edit(int id) [GET]
+       - Este método carga el cliente existente y muestra esta vista con sus datos
+       - Se accede desde: <a asp-action="Edit" asp-route-id="@cliente.Id">Editar</a>
+    
+    MÉTODOS QUE DEBES USAR EN ESTA VISTA:
+    
+    2. ClientesController.Edit(int id, Cliente cliente) [POST]
+       - Este método procesa el formulario con los cambios
+       - Usa: <form asp-action="Edit" method="post">
+       - IMPORTANTE: Debes incluir el ID del cliente como campo oculto:
+         <input asp-for="Id" type="hidden" />
+       - Incluye SIEMPRE: @Html.AntiForgeryToken() o asp-antiforgery="true"
+       - El botón submit:
+         <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+    
+    3. ClientesController.Index() [GET]
+       - Para el botón "Cancelar"
+       - Usa: <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+       - Regresa a la lista sin guardar cambios
+    
+    CAMPOS QUE DEBE TENER EL FORMULARIO:
+    - Id (OCULTO): <input asp-for="Id" type="hidden" />
+    - RazonSocial: <input asp-for="RazonSocial" class="form-control" />
+    - RUC: <input asp-for="RUC" class="form-control" />
+    - CorreoContacto: <input asp-for="CorreoContacto" class="form-control" />
+    - Telefono: <input asp-for="Telefono" class="form-control" />
+    - Direccion: <input asp-for="Direccion" class="form-control" />
+    
+    POR QUÉ USAR ESTOS MÉTODOS AQUÍ:
+    - El formulario ya viene pre-llenado con los datos actuales del cliente (por Edit[GET])
+    - Al hacer submit, Edit[POST] actualiza el cliente en la base de datos
+    - El campo oculto Id es CRÍTICO para que el controlador sepa qué cliente actualizar
+    - Si hay errores de validación, muestra esta vista con los errores
+    - Si todo es correcto, redirige a Index
+    ====================================================================================
+*@
 @model TechSolutions_program.Models.Cliente
 
 <h1>Editar Cliente</h1>
+
+<form asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+    <input asp-for="Id" type="hidden" />
+
+    <div class="form-group">
+        <label asp-for="RazonSocial"></label>
+        <input asp-for="RazonSocial" class="form-control" />
+        <span asp-validation-for="RazonSocial" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="RUC"></label>
+        <input asp-for="RUC" class="form-control" />
+        <span asp-validation-for="RUC" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="CorreoContacto"></label>
+        <input asp-for="CorreoContacto" class="form-control" />
+        <span asp-validation-for="CorreoContacto" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Telefono"></label>
+        <input asp-for="Telefono" class="form-control" />
+        <span asp-validation-for="Telefono" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Direccion"></label>
+        <input asp-for="Direccion" class="form-control" />
+        <span asp-validation-for="Direccion" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

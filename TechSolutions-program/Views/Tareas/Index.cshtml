@@ -1,3 +1,96 @@
 @model IEnumerable<TechSolutions_program.Models.Tarea>
 
 <h1>Tareas</h1>
+
+@*
+    ====================================================================================
+    VISTA: INDEX DE TAREAS - LISTADO COMPLETO (SOLO PARA LÍDERES)
+    ====================================================================================
+    SEGURIDAD: Solo accesible para rol Líder
+    
+    MÉTODOS DEL CONTROLADOR QUE USA ESTA VISTA:
+    
+    1. TareasController.Index() [GET]
+       - Carga esta vista con TODAS las tareas del sistema (requiere rol Líder)
+       - Se accede con: <a asp-controller="Tareas" asp-action="Index">Gestionar Tareas</a>
+       - Llama a TareaService.GetTareasAsync()
+    
+    MÉTODOS QUE DEBES USAR EN ESTA VISTA:
+    
+    2. TareasController.Create() [GET]
+       - Para mostrar el botón "Nueva Tarea" (SOLO Líderes)
+       - Usa: <a asp-action="Create" class="btn btn-primary">Nueva Tarea</a>
+       - Abre el formulario de creación de tarea
+    
+    3. TareasController.Edit(int id) [GET]
+       - Para editar una tarea existente
+       - Usa: <a asp-action="Edit" asp-route-id="@tarea.Id">Editar</a>
+       - Abre el formulario de edición
+    
+    4. TareasController.Delete(int id) [GET]
+       - Para eliminar una tarea
+       - Usa: <a asp-action="Delete" asp-route-id="@tarea.Id">Eliminar</a>
+       - Abre la confirmación de eliminación
+    
+    5. TareasController.CambiarEstado(int id, string nuevoEstado) [POST]
+       - Para cambiar el estado de una tarea (Pendiente, En Progreso, Finalizado)
+       - Usa: <form asp-action="CambiarEstado" asp-route-id="@tarea.Id" method="post">
+                <button type="submit" name="nuevoEstado" value="En Progreso">Iniciar</button>
+                <button type="submit" name="nuevoEstado" value="Finalizado">Completar</button>
+              </form>
+       - IMPORTANTE: Incluir @Html.AntiForgeryToken()
+       - Llama a TareaService.CambiarEstadoAsync()
+    
+    DATOS DEL MODELO A MOSTRAR:
+    - @tarea.Descripcion - Descripción de la tarea
+    - @tarea.Estado - Estado actual (Pendiente, En Progreso, Terminado)
+    - @tarea.Prioridad - Prioridad (Baja, Media, Alta)
+    - @tarea.Responsable - ID del desarrollador asignado
+    - @tarea.FechaLimite - Fecha límite
+    - @tarea.ProyectoId - ID del proyecto asociado
+    
+    POR QUÉ USAR ESTOS MÉTODOS AQUÍ:
+    - Esta vista es el panel de control del Líder para gestionar TODAS las tareas
+    - Los botones de cambio de estado permiten actualizar el progreso rápidamente
+    - CambiarEstado es CRÍTICO para que los botones de estado funcionen
+    - Los Desarrolladores NO ven esta vista, ellos usan MisTareas
+    ====================================================================================
+*@
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Descripción</th>
+            <th>Estado</th>
+            <th>Prioridad</th>
+            <th>Responsable</th>
+            <th>Fecha Límite</th>
+            <th>Proyecto ID</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var tarea in Model)
+        {
+            <tr>
+                <td>@tarea.Descripcion</td>
+                <td>@tarea.Estado</td>
+                <td>@tarea.Prioridad</td>
+                <td>@tarea.Responsable</td>
+                <td>@tarea.FechaLimite.ToShortDateString()</td>
+                <td>@tarea.ProyectoId</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@tarea.Id" class="btn btn-warning">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@tarea.Id" class="btn btn-danger">Eliminar</a>
+                    <form asp-action="CambiarEstado" asp-route-id="@tarea.Id" method="post" style="display:inline;">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" name="nuevoEstado" value="En Progreso" class="btn btn-info">Iniciar</button>
+                        <button type="submit" name="nuevoEstado" value="Finalizado" class="btn btn-success">Completar</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Create" class="btn btn-primary">Nueva Tarea</a>
