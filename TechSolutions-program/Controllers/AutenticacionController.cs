@@ -77,7 +77,7 @@ namespace TechSolutions_program.Controllers
                     return LocalRedirect(returnUrl);
                 }
 
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Proyectos");
             }
 
             ModelState.AddModelError(string.Empty, "Intento de inicio de sesión no válido");
@@ -90,7 +90,7 @@ namespace TechSolutions_program.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Login", "Autenticacion");
         }
 
         [AllowAnonymous]
