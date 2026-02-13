@@ -21,6 +21,23 @@ USE TechSolutionsDB;
 GO
 
 -- ====================================================================================
+-- SECCIÓN 0: ROLES DE SEGURIDAD (ASP.NET Core Identity)
+-- ====================================================================================
+-- Inserta roles solo si existen las tablas de Identity (creadas por migraciones)
+IF OBJECT_ID('AspNetRoles', 'U') IS NOT NULL
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM AspNetRoles WHERE NormalizedName = 'LIDER')
+        INSERT INTO AspNetRoles (Id, Name, NormalizedName) VALUES (CONVERT(NVARCHAR(450), NEWID()), 'Lider', 'LIDER');
+
+    IF NOT EXISTS (SELECT 1 FROM AspNetRoles WHERE NormalizedName = 'DESARROLLADOR')
+        INSERT INTO AspNetRoles (Id, Name, NormalizedName) VALUES (CONVERT(NVARCHAR(450), NEWID()), 'Desarrollador', 'DESARROLLADOR');
+
+    IF NOT EXISTS (SELECT 1 FROM AspNetRoles WHERE NormalizedName = 'ADMINISTRADOR')
+        INSERT INTO AspNetRoles (Id, Name, NormalizedName) VALUES (CONVERT(NVARCHAR(450), NEWID()), 'Administrador', 'ADMINISTRADOR');
+END
+GO
+
+-- ====================================================================================
 -- SECCIÓN 1: TABLAS DEL NEGOCIO (DDL)
 -- ====================================================================================
 
