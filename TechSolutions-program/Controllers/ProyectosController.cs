@@ -93,8 +93,18 @@ namespace TechSolutions_program.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            await Task.CompletedTask;
-            return View();
+            try
+            {
+                // Cargar lista de clientes para el dropdown
+                var clientes = await _proyectoService.GetClientesAsync();
+                ViewBag.Clientes = clientes;
+                return View();
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error al cargar el formulario: {ex.Message}";
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         /// <summary>
@@ -110,6 +120,9 @@ namespace TechSolutions_program.Controllers
         {
             if (!ModelState.IsValid)
             {
+                // Recargar clientes en caso de error de validación
+                var clientes = await _proyectoService.GetClientesAsync();
+                ViewBag.Clientes = clientes;
                 TempData["ErrorMessage"] = "Por favor, corrija los errores en el formulario.";
                 return View(proyecto);
             }
@@ -122,6 +135,9 @@ namespace TechSolutions_program.Controllers
             }
             catch (Exception ex)
             {
+                // Recargar clientes en caso de error
+                var clientes = await _proyectoService.GetClientesAsync();
+                ViewBag.Clientes = clientes;
                 TempData["ErrorMessage"] = $"Error al crear el proyecto: {ex.Message}";
                 return View(proyecto);
             }
@@ -145,6 +161,10 @@ namespace TechSolutions_program.Controllers
                     TempData["ErrorMessage"] = "El proyecto solicitado no existe.";
                     return RedirectToAction(nameof(Index));
                 }
+
+                // Cargar clientes para el dropdown
+                var clientes = await _proyectoService.GetClientesAsync();
+                ViewBag.Clientes = clientes;
 
                 return View(proyecto);
             }
@@ -174,6 +194,9 @@ namespace TechSolutions_program.Controllers
 
             if (!ModelState.IsValid)
             {
+                // Recargar clientes en caso de error
+                var clientes = await _proyectoService.GetClientesAsync();
+                ViewBag.Clientes = clientes;
                 TempData["ErrorMessage"] = "Por favor, corrija los errores en el formulario.";
                 return View(proyecto);
             }
@@ -186,6 +209,9 @@ namespace TechSolutions_program.Controllers
             }
             catch (Exception ex)
             {
+                // Recargar clientes en caso de error
+                var clientes = await _proyectoService.GetClientesAsync();
+                ViewBag.Clientes = clientes;
                 TempData["ErrorMessage"] = $"Error al actualizar el proyecto: {ex.Message}";
                 return View(proyecto);
             }

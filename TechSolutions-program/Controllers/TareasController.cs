@@ -91,12 +91,26 @@ namespace TechSolutions_program.Controllers
         /// Muestra el formulario para crear una nueva tarea (solo para Líderes)
         /// Usado en: <a asp-action="Create">Nueva Tarea</a>
         /// </summary>
-        [Authorize(Roles = "Lider")]
+        [Authorize(Roles = "Lider,Administrador")]
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            await Task.CompletedTask;
-            return View();
+            try
+            {
+                // Cargar listas para dropdowns
+                var proyectos = await _tareaService.GetProyectosAsync();
+                var usuarios = await _tareaService.GetUsuariosAsync();
+                
+                ViewBag.Proyectos = proyectos;
+                ViewBag.Usuarios = usuarios;
+                
+                return View();
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error al cargar el formulario: {ex.Message}";
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         /// <summary>
@@ -104,24 +118,38 @@ namespace TechSolutions_program.Controllers
         /// Procesa el formulario de creación de tarea (solo para Líderes)
         /// Usado en: <form asp-action="Create"> con botón submit
         /// </summary>
-        [Authorize(Roles = "Lider")]
+        [Authorize(Roles = "Lider,Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Tarea tarea)
         {
             if (!ModelState.IsValid)
             {
+                // Recargar listas en caso de error
+                var proyectos = await _tareaService.GetProyectosAsync();
+                var usuarios = await _tareaService.GetUsuariosAsync();
+                ViewBag.Proyectos = proyectos;
+                ViewBag.Usuarios = usuarios;
+                
+                TempData["ErrorMessage"] = "Por favor, corrija los errores en el formulario.";
                 return View(tarea);
             }
 
             try
             {
                 await _tareaService.CrearAsync(tarea);
+                TempData["SuccessMessage"] = $"La tarea '{tarea.Descripcion}' se creó exitosamente.";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
+                // Recargar listas en caso de error
+                var proyectos = await _tareaService.GetProyectosAsync();
+                var usuarios = await _tareaService.GetUsuariosAsync();
+                ViewBag.Proyectos = proyectos;
+                ViewBag.Usuarios = usuarios;
+                
+                TempData["ErrorMessage"] = $"Error al crear la tarea: {ex.Message}";
                 return View(tarea);
             }
         }

@@ -38,5 +38,11 @@ namespace TechSolutions_program.Services.Interfaces
         /// Usado en: ProyectosController.DeleteConfirmed() [POST]
         /// </summary>
         Task EliminarAsync(int id);
+
+        /// <summary>
+        /// Obtiene todos los clientes para dropdowns
+        /// Usado en: ProyectosController.Create(), Edit()
+        /// </summary>
+        Task<IEnumerable<Cliente>> GetClientesAsync();
     }
 }

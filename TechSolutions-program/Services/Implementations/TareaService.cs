@@ -98,19 +98,51 @@ namespace TechSolutions_program.Services.Implementations
         }
 
         /// <summary>
-        /// Cambia el estado de una tarea (Pendiente, En Progreso, Finalizado)
-        /// Llamado desde: TareasController.CambiarEstado() [POST]
-        /// Permite a los desarrolladores actualizar el progreso de sus tareas
+        /// Obtiene la lista de todos los proyectos para dropdowns
+        /// Llamado desde: TareasController.Create(), Edit()
+        /// </summary>
+        public async Task<IEnumerable<Proyecto>> GetProyectosAsync()
+        {
+            return await _dbContext.Proyectos
+                .OrderBy(p => p.Nombre)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        /// <summary>
+        /// Obtiene la lista de todos los usuarios para dropdowns
+        /// Llamado desde: TareasController.Create(), Edit()
+        /// </summary>
+        public async Task<IEnumerable<Usuario>> GetUsuariosAsync()
+        {
+            return await _dbContext.Users
+                .OrderBy(u => u.NombreCompleto)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        /// <summary>
+        /// Cambia el estado de una tarea
+        /// Llamado desde: TareasController.CambiarEstado()
+        /// Permite a los desarrolladores actualizar el estado de sus tareas
         /// </summary>
         public async Task CambiarEstadoAsync(int id, string nuevoEstado)
         {
-            var tarea = await _dbContext.Tareas.FirstOrDefaultAsync(t => t.Id == id);
+            var tarea = await _dbContext.Tareas.FindAsync(id);
             if (tarea == null)
             {
-                return;
+                throw new InvalidOperationException("Tarea no encontrada");
+            }
+
+            // Validar que el estado sea válido
+            var estadosValidos = new[] { "Pendiente", "En Progreso", "Finalizado" };
+            if (!estadosValidos.Contains(nuevoEstado))
+            {
+                throw new ArgumentException("Estado no válido", nameof(nuevoEstado));
             }
 
             tarea.Estado = nuevoEstado;
+            _dbContext.Tareas.Update(tarea);
             await _dbContext.SaveChangesAsync();
         }
     }
