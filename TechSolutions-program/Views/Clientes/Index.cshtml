@@ -6,18 +6,25 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="h3 mb-0">Clientes</h1>
-    <a asp-action="Create" class="btn btn-primary">Nuevo cliente</a>
+    @if (User.IsInRole("Lider") || User.IsInRole("Administrador"))
+    {
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Nuevo cliente
+        </a>
+    }
 </div>
 
 @if (!Model.Any())
 {
-    <div class="alert alert-info">No hay clientes registrados.</div>
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> No hay clientes registrados.
+    </div>
 }
 else
 {
     <div class="table-responsive">
         <table class="table table-striped align-middle">
-            <thead>
+            <thead class="table-light">
                 <tr>
                     <th>Razón social</th>
                     <th>RUC</th>
@@ -31,15 +38,42 @@ else
                 @foreach (var cliente in Model)
                 {
                     <tr>
-                        <td>@cliente.RazonSocial</td>
+                        <td><strong>@cliente.RazonSocial</strong></td>
                         <td>@cliente.RUC</td>
-                        <td>@cliente.EmailContacto</td>
-                        <td>@cliente.Telefono</td>
+                        <td>
+                            <a href="mailto:@cliente.EmailContacto" class="text-decoration-none">
+                                <i class="bi bi-envelope"></i> @cliente.EmailContacto
+                            </a>
+                        </td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(cliente.Telefono))
+                            {
+                                <i class="bi bi-telephone"></i> @cliente.Telefono
+                            }
+                            else
+                            {
+                                <span class="text-muted">N/A</span>
+                            }
+                        </td>
                         <td>@cliente.Direccion</td>
                         <td class="text-end">
-                            <a asp-action="Details" asp-route-id="@cliente.Id" class="btn btn-sm btn-outline-info">Ver</a>
-                            <a asp-action="Edit" asp-route-id="@cliente.Id" class="btn btn-sm btn-outline-warning">Editar</a>
-                            <a asp-action="Delete" asp-route-id="@cliente.Id" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                            <div class="btn-group" role="group">
+                                <a asp-action="Details" asp-route-id="@cliente.Id" 
+                                   class="btn btn-sm btn-outline-info" title="Ver detalles">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                @if (User.IsInRole("Lider") || User.IsInRole("Administrador"))
+                                {
+                                    <a asp-action="Edit" asp-route-id="@cliente.Id" 
+                                       class="btn btn-sm btn-outline-warning" title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@cliente.Id" 
+                                       class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                }
+                            </div>
                         </td>
                     </tr>
                 }

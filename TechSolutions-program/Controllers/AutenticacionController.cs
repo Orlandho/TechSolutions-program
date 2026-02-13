@@ -121,6 +121,7 @@ namespace TechSolutions_program.Controllers
         public async Task<IActionResult> AccessDenied()
         {
             await Task.CompletedTask;
+            TempData["ErrorMessage"] = "No tienes permisos para acceder a esta funcionalidad. Contacta al administrador si necesitas acceso.";
             return View();
         }
     }

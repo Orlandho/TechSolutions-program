@@ -52,7 +52,7 @@ namespace TechSolutions_program.Controllers
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
+                TempData["ErrorMessage"] = $"Error al cargar los proyectos: {ex.Message}";
                 return View(Array.Empty<Proyecto>());
             }
         }
@@ -70,15 +70,16 @@ namespace TechSolutions_program.Controllers
                 var proyecto = await _proyectoService.GetByIdAsync(id);
                 if (proyecto == null)
                 {
-                    return NotFound();
+                    TempData["ErrorMessage"] = "El proyecto solicitado no existe.";
+                    return RedirectToAction(nameof(Index));
                 }
 
                 return View(proyecto);
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
-                return View();
+                TempData["ErrorMessage"] = $"Error al cargar los detalles del proyecto: {ex.Message}";
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -109,17 +110,19 @@ namespace TechSolutions_program.Controllers
         {
             if (!ModelState.IsValid)
             {
+                TempData["ErrorMessage"] = "Por favor, corrija los errores en el formulario.";
                 return View(proyecto);
             }
 
             try
             {
                 await _proyectoService.CrearAsync(proyecto);
+                TempData["SuccessMessage"] = $"El proyecto '{proyecto.Nombre}' se creó exitosamente.";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
+                TempData["ErrorMessage"] = $"Error al crear el proyecto: {ex.Message}";
                 return View(proyecto);
             }
         }
@@ -139,15 +142,16 @@ namespace TechSolutions_program.Controllers
                 var proyecto = await _proyectoService.GetByIdAsync(id);
                 if (proyecto == null)
                 {
-                    return NotFound();
+                    TempData["ErrorMessage"] = "El proyecto solicitado no existe.";
+                    return RedirectToAction(nameof(Index));
                 }
 
                 return View(proyecto);
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
-                return View();
+                TempData["ErrorMessage"] = $"Error al cargar el proyecto para editar: {ex.Message}";
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -164,22 +168,25 @@ namespace TechSolutions_program.Controllers
         {
             if (id != proyecto.Id)
             {
-                return BadRequest();
+                TempData["ErrorMessage"] = "Error de validación: ID de proyecto no coincide.";
+                return RedirectToAction(nameof(Index));
             }
 
             if (!ModelState.IsValid)
             {
+                TempData["ErrorMessage"] = "Por favor, corrija los errores en el formulario.";
                 return View(proyecto);
             }
 
             try
             {
                 await _proyectoService.ActualizarAsync(proyecto);
+                TempData["SuccessMessage"] = $"El proyecto '{proyecto.Nombre}' se actualizó exitosamente.";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
+                TempData["ErrorMessage"] = $"Error al actualizar el proyecto: {ex.Message}";
                 return View(proyecto);
             }
         }
@@ -199,15 +206,16 @@ namespace TechSolutions_program.Controllers
                 var proyecto = await _proyectoService.GetByIdAsync(id);
                 if (proyecto == null)
                 {
-                    return NotFound();
+                    TempData["ErrorMessage"] = "El proyecto solicitado no existe.";
+                    return RedirectToAction(nameof(Index));
                 }
 
                 return View(proyecto);
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
-                return View();
+                TempData["ErrorMessage"] = $"Error al cargar el proyecto para eliminar: {ex.Message}";
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -225,14 +233,17 @@ namespace TechSolutions_program.Controllers
         {
             try
             {
+                var proyecto = await _proyectoService.GetByIdAsync(id);
+                var nombreProyecto = proyecto?.Nombre ?? $"ID {id}";
+                
                 await _proyectoService.EliminarAsync(id);
+                TempData["SuccessMessage"] = $"El proyecto '{nombreProyecto}' se eliminó exitosamente.";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
-                var proyecto = await _proyectoService.GetByIdAsync(id);
-                return View(proyecto);
+                TempData["ErrorMessage"] = $"Error al eliminar el proyecto: {ex.Message}";
+                return RedirectToAction(nameof(Index));
             }
         }
     }
