@@ -1,4 +1,6 @@
-﻿using TechSolutions_program.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using TechSolutions_program.Data;
+using TechSolutions_program.Models;
 
 namespace TechSolutions_program.Services
 {
@@ -20,29 +22,45 @@ namespace TechSolutions_program.Services
          * ====================================================================================
          */
 
-        public Task<IEnumerable<Proyecto>> GetProyectosAsync()
+        private readonly ApplicationDbContext _dbContext;
+
+        public ProyectoService(ApplicationDbContext dbContext)
         {
-            return Task.FromResult<IEnumerable<Proyecto>>(Array.Empty<Proyecto>());
+            _dbContext = dbContext;
         }
 
-        public Task<Proyecto?> GetByIdAsync(int id)
+        public async Task<IEnumerable<Proyecto>> GetProyectosAsync()
         {
-            return Task.FromResult<Proyecto?>(null);
+            return await _dbContext.Proyectos.AsNoTracking().ToListAsync();
         }
 
-        public Task CrearAsync(Proyecto proyecto)
+        public async Task<Proyecto?> GetByIdAsync(int id)
         {
-            return Task.CompletedTask;
+            return await _dbContext.Proyectos.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public Task ActualizarAsync(Proyecto proyecto)
+        public async Task CrearAsync(Proyecto proyecto)
         {
-            return Task.CompletedTask;
+            _dbContext.Proyectos.Add(proyecto);
+            await _dbContext.SaveChangesAsync();
         }
 
-        public Task EliminarAsync(int id)
+        public async Task ActualizarAsync(Proyecto proyecto)
         {
-            return Task.CompletedTask;
+            _dbContext.Proyectos.Update(proyecto);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task EliminarAsync(int id)
+        {
+            var proyecto = await _dbContext.Proyectos.FirstOrDefaultAsync(p => p.Id == id);
+            if (proyecto == null)
+            {
+                return;
+            }
+
+            _dbContext.Proyectos.Remove(proyecto);
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

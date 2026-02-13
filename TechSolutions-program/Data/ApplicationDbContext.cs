@@ -35,6 +35,7 @@ namespace TechSolutions_program.Data
         public DbSet<Proyecto> Proyectos { get; set; }
         public DbSet<Tarea> Tareas { get; set; }
         public DbSet<Cliente> Clientes { get; set; }
+        public DbSet<Reporte> Reportes { get; set; }
         // No necesitas 'DbSet<Usuario>' porque Identity ya lo incluye internamente
     }
 }

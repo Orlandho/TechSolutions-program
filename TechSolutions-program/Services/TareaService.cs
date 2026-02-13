@@ -1,4 +1,6 @@
-﻿using TechSolutions_program.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using TechSolutions_program.Data;
+using TechSolutions_program.Models;
 
 namespace TechSolutions_program.Services
 {
@@ -21,39 +23,64 @@ namespace TechSolutions_program.Services
          * ====================================================================================
          */
 
-        public Task<IEnumerable<Tarea>> GetTareasAsync()
+        private readonly ApplicationDbContext _dbContext;
+
+        public TareaService(ApplicationDbContext dbContext)
         {
-            return Task.FromResult<IEnumerable<Tarea>>(Array.Empty<Tarea>());
+            _dbContext = dbContext;
         }
 
-        public Task<IEnumerable<Tarea>> GetTareasPorResponsableAsync(string responsableId)
+        public async Task<IEnumerable<Tarea>> GetTareasAsync()
         {
-            return Task.FromResult<IEnumerable<Tarea>>(Array.Empty<Tarea>());
+            return await _dbContext.Tareas.AsNoTracking().ToListAsync();
         }
 
-        public Task<Tarea?> GetByIdAsync(int id)
+        public async Task<IEnumerable<Tarea>> GetTareasPorResponsableAsync(string responsableId)
         {
-            return Task.FromResult<Tarea?>(null);
+            return await _dbContext.Tareas.AsNoTracking()
+                .Where(t => t.Responsable == responsableId)
+                .ToListAsync();
         }
 
-        public Task CrearAsync(Tarea tarea)
+        public async Task<Tarea?> GetByIdAsync(int id)
         {
-            return Task.CompletedTask;
+            return await _dbContext.Tareas.AsNoTracking().FirstOrDefaultAsync(t => t.Id == id);
         }
 
-        public Task ActualizarAsync(Tarea tarea)
+        public async Task CrearAsync(Tarea tarea)
         {
-            return Task.CompletedTask;
+            _dbContext.Tareas.Add(tarea);
+            await _dbContext.SaveChangesAsync();
         }
 
-        public Task EliminarAsync(int id)
+        public async Task ActualizarAsync(Tarea tarea)
         {
-            return Task.CompletedTask;
+            _dbContext.Tareas.Update(tarea);
+            await _dbContext.SaveChangesAsync();
         }
 
-        public Task CambiarEstadoAsync(int id, string nuevoEstado)
+        public async Task EliminarAsync(int id)
         {
-            return Task.CompletedTask;
+            var tarea = await _dbContext.Tareas.FirstOrDefaultAsync(t => t.Id == id);
+            if (tarea == null)
+            {
+                return;
+            }
+
+            _dbContext.Tareas.Remove(tarea);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task CambiarEstadoAsync(int id, string nuevoEstado)
+        {
+            var tarea = await _dbContext.Tareas.FirstOrDefaultAsync(t => t.Id == id);
+            if (tarea == null)
+            {
+                return;
+            }
+
+            tarea.Estado = nuevoEstado;
+            await _dbContext.SaveChangesAsync();
         }
     }
 }
