@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace TechSolutions_program.Models
 {
@@ -20,7 +21,7 @@ namespace TechSolutions_program.Models
         [Required(ErrorMessage = "La Razón Social es obligatoria")]
         [StringLength(100)]
         [Display(Name = "Empresa / Razón Social")]
-        public string RazonSocial { get; set; }
+        public string RazonSocial { get; set; } = string.Empty;
 
         /// <summary>
         /// Registro Único de Contribuyentes (identificador tributario en Perú)
@@ -29,34 +30,35 @@ namespace TechSolutions_program.Models
         [Required(ErrorMessage = "El RUC es obligatorio")]
         [StringLength(11, MinimumLength = 11, ErrorMessage = "El RUC debe tener 11 dígitos")]
         [RegularExpression("^[0-9]*$", ErrorMessage = "El RUC solo debe contener números")]
-        public string RUC { get; set; }
+        public string RUC { get; set; } = string.Empty;
 
         /// <summary>
         /// Correo electrónico de contacto del cliente
         /// Usado en: Comunicaciones y notificaciones del proyecto
         /// </summary>
-        [Required]
+        [Required(ErrorMessage = "El correo de contacto es obligatorio")]
         [EmailAddress(ErrorMessage = "Ingrese un correo válido")]
-        public string CorreoContacto { get; set; }
+        public string EmailContacto { get; set; } = string.Empty;
 
         /// <summary>
         /// Número de teléfono de contacto
         /// Usado en: Comunicaciones directas con el cliente
         /// </summary>
-        public string Telefono { get; set; }
+        public string? Telefono { get; set; }
 
         /// <summary>
         /// Dirección física de la empresa cliente
         /// Usado en: Información de contacto y documentación legal
         /// </summary>
-        public string Direccion { get; set; }
+        public string? Direccion { get; set; }
 
         /// <summary>
         /// Colección de proyectos asociados a este cliente
         /// Usado en: Vista de detalles del cliente para listar sus proyectos
+        /// NOTA: Esta propiedad NO se valida en formularios
         /// </summary>
-        // Relación: Una empresa cliente tiene muchos proyectos con nosotros
-        public virtual ICollection<Proyecto> Proyectos { get; set; }
+        [BindNever] // No vincular en model binding para evitar validación
+        public virtual ICollection<Proyecto>? Proyectos { get; set; }
 
     }
 }

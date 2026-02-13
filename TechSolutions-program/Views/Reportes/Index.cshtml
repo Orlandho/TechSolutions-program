@@ -1,6 +1,35 @@
 @model IEnumerable<TechSolutions_program.Models.Reporte>
 
-<h1>Generador de Reportes</h1>
+@{
+    ViewData["Title"] = "Reportes";
+}
+
+<h1 class="h3">Generador de reportes</h1>
+
+<div class="alert alert-info mt-3">
+    Ingresa el ID del proyecto y elige el formato para descargar el reporte.
+</div>
+
+<form asp-action="Descargar" method="get" class="row g-3 mt-1">
+    <div class="col-md-4">
+        <label for="proyectoId" class="form-label">ID del proyecto</label>
+        <input id="proyectoId" name="proyectoId" type="number" class="form-control" min="1" required />
+    </div>
+    <div class="col-md-4">
+        <label for="tipoReporte" class="form-label">Formato</label>
+        <select id="tipoReporte" name="tipoReporte" class="form-select" required>
+            <option value="pdf">PDF</option>
+            <option value="excel">Excel</option>
+        </select>
+    </div>
+    <div class="col-md-4 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary">Descargar</button>
+    </div>
+</form>
+
+<div class="mt-4">
+    <a asp-controller="Proyectos" asp-action="Index" class="btn btn-outline-secondary">Ver proyectos</a>
+</div>
 
 @*
     ====================================================================================

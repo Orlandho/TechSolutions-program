@@ -41,7 +41,7 @@ namespace TechSolutions_program.Services.Interfaces
 
         /// <summary>
         /// Elimina una tarea del sistema
-        /// Usado en: TareasController.DeleteConfirmed() [POST]
+        /// Usado in: TareasController.DeleteConfirmed() [POST]
         /// </summary>
         Task EliminarAsync(int id);
 
@@ -51,5 +51,17 @@ namespace TechSolutions_program.Services.Interfaces
         /// Este método es clave para que los botones de cambio de estado funcionen en las vistas
         /// </summary>
         Task CambiarEstadoAsync(int id, string nuevoEstado);
+
+        /// <summary>
+        /// Obtiene todos los proyectos para dropdowns
+        /// Usado en: TareasController.Create(), Edit()
+        /// </summary>
+        Task<IEnumerable<Proyecto>> GetProyectosAsync();
+
+        /// <summary>
+        /// Obtiene todos los usuarios (desarrolladores) para dropdowns
+        /// Usado en: TareasController.Create(), Edit()
+        /// </summary>
+        Task<IEnumerable<Usuario>> GetUsuariosAsync();
     }
 }

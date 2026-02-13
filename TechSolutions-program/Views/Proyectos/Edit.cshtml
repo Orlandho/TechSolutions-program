@@ -1,122 +1,135 @@
 @model TechSolutions_program.Models.Proyecto
 
-@*
+@{
+    ViewData["Title"] = "Editar proyecto";
+    var clientes = ViewBag.Clientes as IEnumerable<TechSolutions_program.Models.Cliente>;
+}
 
-    ====================================================================================
-    VISTA: EDIT DE PROYECTOS - FORMULARIO DE EDICIÓN
-    ====================================================================================
-    SEGURIDAD: Solo accesible para roles Líder y Administrador
-    
-    MÉTODOS DEL CONTROLADOR QUE USA ESTA VISTA:
-    
-    1. ProyectosController.Edit(int id) [GET]
-       - Este método carga el proyecto existente y muestra esta vista con sus datos
-       - Se accede desde: <a asp-action="Edit" asp-route-id="@proyecto.Id">Editar</a>
-       - Llama a ProyectoService.GetByIdAsync(id) para obtener los datos
-    
-    MÉTODOS QUE DEBES USAR EN ESTA VISTA:
-    
-    2. ProyectosController.Edit(int id, Proyecto proyecto) [POST]
-       - Este método procesa el formulario con los cambios
-       - Usa: <form asp-action="Edit" method="post">
-       - CRÍTICO: Incluir el ID como campo oculto:
-         <input asp-for="Id" type="hidden" />
-       - Incluye SIEMPRE: @Html.AntiForgeryToken() o asp-antiforgery="true"
-       - Llama a ProyectoService.ActualizarAsync() para guardar cambios
-       - El botón submit:
-         <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-    
-    3. ProyectosController.Index() [GET]
-       - Para el botón "Cancelar"
-       - Usa: <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
-       - Regresa a la lista sin guardar cambios
-    
-    CAMPOS QUE DEBE TENER EL FORMULARIO:
-    - Id (OCULTO): <input asp-for="Id" type="hidden" />
-    - Nombre: <input asp-for="Nombre" class="form-control" />
-    - Cliente: <input asp-for="Cliente" class="form-control" />
-    - FechaInicio: <input asp-for="FechaInicio" type="date" class="form-control" />
-    - FechaFinEstimada: <input asp-for="FechaFinEstimada" type="date" class="form-control" />
-    - Presupuesto: <input asp-for="Presupuesto" type="number" step="0.01" class="form-control" />
-    - Estado: <select asp-for="Estado" class="form-control">
-                <option value="Planificación">Planificación</option>
-                <option value="En Desarrollo">En Desarrollo</option>
-                <option value="Finalizado">Finalizado</option>
-              </select>
-    - Prioridad: <select asp-for="Prioridad" class="form-control">
-                   <option value="Baja">Baja</option>
-                   <option value="Media">Media</option>
-                   <option value="Alta">Alta</option>
-                 </select>
-    
-    POR QUÉ USAR ESTOS MÉTODOS AQUÍ:
-    - El formulario viene pre-llenado con los datos actuales del proyecto (por Edit[GET])
-    - Edit[POST] valida reglas de negocio antes de actualizar
-    - El campo oculto Id es ESENCIAL para que el controlador sepa qué proyecto actualizar
-    - ProyectoService.ActualizarAsync() actualiza en la base de datos
-    - Si hay errores de validación, muestra esta vista con los errores
-    - Si todo es correcto, redirige a Index
-    ====================================================================================
-
-*@
-
-<h1>Editar Proyecto</h1>
-
-<form asp-action="Edit" method="post">
-    @Html.AntiForgeryToken()
-    <input asp-for="Id" type="hidden" />
-    <div class="form-group">
-        <label asp-for="Nombre"></label>
-        <input asp-for="Nombre" class="form-control" />
-        <span asp-validation-for="Nombre" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Cliente"></label>
-        <input asp-for="Cliente" class="form-control" />
-        <span asp-validation-for="Cliente" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="FechaInicio"></label>
-        <input asp-for="FechaInicio" type="date" class="form-control" />
-        <span asp-validation-for="FechaInicio" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="FechaFinEstimada"></label>
-        <input asp-for="FechaFinEstimada" type="date" class="form-control" />
-        <span asp-validation-for="FechaFinEstimada" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Presupuesto"></label>
-        <input asp-for="Presupuesto" type="number" step="0.01" class="form-control" />
-        <span asp-validation-for="Presupuesto" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Estado"></label>
-        <select asp-for="Estado" class="form-control">
-            <option value="Planificación">Planificación</option>
-            <option value="En Desarrollo">En Desarrollo</option>
-            <option value="Finalizado">Finalizado</option>
-        </select>
-        <span asp-validation-for="Estado" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Prioridad"></label>
-        <select asp-for="Prioridad" class="form-control">
-            <option value="Baja">Baja</option>
-            <option value="Media">Media</option>
-            <option value="Alta">Alta</option>
-        </select>
-        <span asp-validation-for="Prioridad" class="text-danger"></span>
-    </div>
-    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
-</form>
-
-<div>
-    @if (ViewData["Message"] != null)
-    {
-        <div class="alert alert-info">
-            @ViewData["Message"]
+<div class="row">
+    <div class="col-md-10 col-lg-8 mx-auto">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0">
+                <i class="bi bi-pencil-square"></i> Editar Proyecto
+            </h1>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
         </div>
-    }
+
+        <div class="card shadow">
+            <div class="card-body">
+                <form asp-action="Edit" method="post">
+                    @Html.AntiForgeryToken()
+                    <input asp-for="Id" type="hidden" />
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Nombre" class="form-label">
+                                <i class="bi bi-folder"></i> Nombre del Proyecto <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Nombre" class="form-control" />
+                            <span asp-validation-for="Nombre" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="ClienteId" class="form-label">
+                                <i class="bi bi-building"></i> Cliente <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="ClienteId" class="form-select">
+                                <option value="">-- Seleccione un cliente --</option>
+                                @if (clientes != null)
+                                {
+                                    foreach (var cliente in clientes)
+                                    {
+                                        <option value="@cliente.Id">@cliente.RazonSocial</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="ClienteId" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Descripcion" class="form-label">
+                            <i class="bi bi-text-paragraph"></i> Descripción
+                        </label>
+                        <textarea asp-for="Descripcion" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="Descripcion" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="FechaInicio" class="form-label">
+                                <i class="bi bi-calendar-event"></i> Fecha de Inicio <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="FechaInicio" type="date" class="form-control" />
+                            <span asp-validation-for="FechaInicio" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="FechaFinEstimada" class="form-label">
+                                <i class="bi bi-calendar-check"></i> Fecha Fin Estimada <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="FechaFinEstimada" type="date" class="form-control" />
+                            <span asp-validation-for="FechaFinEstimada" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="Presupuesto" class="form-label">
+                                <i class="bi bi-cash-stack"></i> Presupuesto <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input asp-for="Presupuesto" type="number" step="0.01" min="0" class="form-control" />
+                            </div>
+                            <span asp-validation-for="Presupuesto" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Estado" class="form-label">
+                                <i class="bi bi-flag"></i> Estado
+                            </label>
+                            <select asp-for="Estado" class="form-select">
+                                <option value="Planificación">Planificación</option>
+                                <option value="En Desarrollo">En Desarrollo</option>
+                                <option value="Pruebas">Pruebas</option>
+                                <option value="Finalizado">Finalizado</option>
+                            </select>
+                            <span asp-validation-for="Estado" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Prioridad" class="form-label">
+                                <i class="bi bi-exclamation-triangle"></i> Prioridad
+                            </label>
+                            <select asp-for="Prioridad" class="form-select">
+                                <option value="Baja">Baja</option>
+                                <option value="Media">Media</option>
+                                <option value="Alta">Alta</option>
+                            </select>
+                            <span asp-validation-for="Prioridad" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <div class="d-flex gap-2 justify-content-end">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

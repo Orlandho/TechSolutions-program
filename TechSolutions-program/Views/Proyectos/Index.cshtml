@@ -1,59 +1,100 @@
 @model IEnumerable<TechSolutions_program.Models.Proyecto>
 
-<h1>Proyectos</h1>
+@{
+    ViewData["Title"] = "Proyectos";
+}
 
-@*
-    ====================================================================================
-    VISTA: INDEX DE PROYECTOS - LISTADO MAESTRO
-    ====================================================================================
-    MÉTODOS DEL CONTROLADOR QUE USA ESTA VISTA:
-    
-    1. ProyectosController.Index() [GET]
-       - Carga esta vista con la lista de todos los proyectos del sistema
-       - Se accede con: <a asp-controller="Proyectos" asp-action="Index">Ver Proyectos</a>
-    
-    MÉTODOS QUE DEBES USAR EN ESTA VISTA:
-    
-    2. ProyectosController.Create() [GET]
-       - Para mostrar el botón "Nuevo Proyecto" (SOLO para Líder/Administrador)
-       - Usa: <a asp-action="Create" class="btn btn-primary">Nuevo Proyecto</a>
-       - Abre el formulario de creación
-       - NOTA: Este botón debe mostrarse SOLO si el usuario tiene rol Líder/Administrador
-    
-    3. ProyectosController.Details(int id) [GET]
-       - Para ver los detalles completos de un proyecto
-       - Usa: <a asp-action="Details" asp-route-id="@proyecto.Id">Ver Detalles</a>
-       - Muestra información detallada: tareas, presupuesto, fechas, etc.
-    
-    4. ProyectosController.Edit(int id) [GET]
-       - Para editar un proyecto existente (SOLO para Líder/Administrador)
-       - Usa: <a asp-action="Edit" asp-route-id="@proyecto.Id">Editar</a>
-       - Abre el formulario de edición
-    
-    5. ProyectosController.Delete(int id) [GET]
-       - Para eliminar un proyecto (SOLO para Líder/Administrador)
-       - Usa: <a asp-action="Delete" asp-route-id="@proyecto.Id">Eliminar</a>
-       - Abre la confirmación de eliminación
-    
-    6. ReportesController.Descargar(string tipoReporte, int proyectoId) [GET/POST]
-       - Para generar reportes PDF o Excel de un proyecto
-       - Usa: <a asp-controller="Reportes" asp-action="Descargar" 
-                  asp-route-tipoReporte="pdf" asp-route-proyectoId="@proyecto.Id">PDF</a>
-       - Usa: <a asp-controller="Reportes" asp-action="Descargar" 
-                  asp-route-tipoReporte="excel" asp-route-proyectoId="@proyecto.Id">Excel</a>
-    
-    DATOS DEL MODELO A MOSTRAR:
-    - @proyecto.Nombre - Nombre del proyecto
-    - @proyecto.Cliente - Cliente asociado
-    - @proyecto.Presupuesto - Presupuesto total
-    - @proyecto.Estado - Estado actual (Planificación, En Desarrollo, Finalizado)
-    - @proyecto.FechaInicio y @proyecto.FechaFinEstimada
-    - @proyecto.Prioridad - Prioridad (Baja, Media, Alta)
-    
-    POR QUÉ USAR ESTOS MÉTODOS AQUÍ:
-    - Esta es la vista principal de gestión de proyectos
-    - Los Desarrolladores solo pueden VER (Details), no Create/Edit/Delete
-    - Los Líderes/Administradores tienen acceso completo CRUD
-    - Los reportes están disponibles para todos los roles
-    ====================================================================================
-*@
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Proyectos</h1>
+    @if (User.IsInRole("Lider") || User.IsInRole("Administrador"))
+    {
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Nuevo proyecto
+        </a>
+    }
+</div>
+
+@* Sistema de notificaciones *@
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill"></i> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill"></i> @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["WarningMessage"] != null)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-circle-fill"></i> @TempData["WarningMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No hay proyectos registrados.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Proyecto</th>
+                    <th>Cliente</th>
+                    <th>Estado</th>
+                    <th>Prioridad</th>
+                    <th>Presupuesto</th>
+                    <th>Fechas</th>
+                    <th class="text-end">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var proyecto in Model)
+                {
+                    <tr>
+                        <td>@proyecto.Nombre</td>
+                        <td>@proyecto.Cliente</td>
+                        <td>
+                            <span class="badge @(proyecto.Estado == "Finalizado" ? "bg-success" : proyecto.Estado == "En Desarrollo" ? "bg-warning text-dark" : "bg-secondary")">
+                                @proyecto.Estado
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge @(proyecto.Prioridad == "Alta" ? "bg-danger" : proyecto.Prioridad == "Media" ? "bg-warning text-dark" : "bg-info")">
+                                @proyecto.Prioridad
+                            </span>
+                        </td>
+                        <td>@proyecto.Presupuesto.ToString("C2")</td>
+                        <td>
+                            @proyecto.FechaInicio.ToString("dd/MM/yyyy")
+                            @if (proyecto.FechaFinEstimada != default)
+                            {
+                                <span class="text-muted"> - @proyecto.FechaFinEstimada.ToString("dd/MM/yyyy")</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            <a asp-action="Details" asp-route-id="@proyecto.Id" class="btn btn-sm btn-outline-info">Ver</a>
+                            @if (User.IsInRole("Lider") || User.IsInRole("Administrador"))
+                            {
+                                <a asp-action="Edit" asp-route-id="@proyecto.Id" class="btn btn-sm btn-outline-warning">Editar</a>
+                                <a asp-action="Delete" asp-route-id="@proyecto.Id" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                            }
+                            <a asp-controller="Reportes" asp-action="Descargar" asp-route-tipoReporte="pdf" asp-route-proyectoId="@proyecto.Id" class="btn btn-sm btn-outline-secondary">PDF</a>
+                            <a asp-controller="Reportes" asp-action="Descargar" asp-route-tipoReporte="excel" asp-route-proyectoId="@proyecto.Id" class="btn btn-sm btn-outline-success">Excel</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

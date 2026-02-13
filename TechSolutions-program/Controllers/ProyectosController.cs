@@ -52,7 +52,7 @@ namespace TechSolutions_program.Controllers
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
+                TempData["ErrorMessage"] = $"Error al cargar los proyectos: {ex.Message}";
                 return View(Array.Empty<Proyecto>());
             }
         }
@@ -70,15 +70,16 @@ namespace TechSolutions_program.Controllers
                 var proyecto = await _proyectoService.GetByIdAsync(id);
                 if (proyecto == null)
                 {
-                    return NotFound();
+                    TempData["ErrorMessage"] = "El proyecto solicitado no existe.";
+                    return RedirectToAction(nameof(Index));
                 }
 
                 return View(proyecto);
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
-                return View();
+                TempData["ErrorMessage"] = $"Error al cargar los detalles del proyecto: {ex.Message}";
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -92,8 +93,18 @@ namespace TechSolutions_program.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            await Task.CompletedTask;
-            return View();
+            try
+            {
+                // Cargar lista de clientes para el dropdown
+                var clientes = await _proyectoService.GetClientesAsync();
+                ViewBag.Clientes = clientes;
+                return View();
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error al cargar el formulario: {ex.Message}";
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         /// <summary>
@@ -109,17 +120,32 @@ namespace TechSolutions_program.Controllers
         {
             if (!ModelState.IsValid)
             {
+                // Recargar clientes en caso de error de validación
+                var clientes = await _proyectoService.GetClientesAsync();
+                ViewBag.Clientes = clientes;
+                
+                // Mostrar todos los errores en el log para debugging
+                var errors = ModelState.Values.SelectMany(v => v.Errors);
+                foreach (var error in errors)
+                {
+                    Console.WriteLine($"Error de validación: {error.ErrorMessage}");
+                }
+                
                 return View(proyecto);
             }
 
             try
             {
                 await _proyectoService.CrearAsync(proyecto);
+                TempData["SuccessMessage"] = $"El proyecto '{proyecto.Nombre}' se creó exitosamente.";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
+                // Recargar clientes en caso de error
+                var clientes = await _proyectoService.GetClientesAsync();
+                ViewBag.Clientes = clientes;
+                TempData["ErrorMessage"] = $"Error al crear el proyecto: {ex.Message}";
                 return View(proyecto);
             }
         }
@@ -139,15 +165,20 @@ namespace TechSolutions_program.Controllers
                 var proyecto = await _proyectoService.GetByIdAsync(id);
                 if (proyecto == null)
                 {
-                    return NotFound();
+                    TempData["ErrorMessage"] = "El proyecto solicitado no existe.";
+                    return RedirectToAction(nameof(Index));
                 }
+
+                // Cargar clientes para el dropdown
+                var clientes = await _proyectoService.GetClientesAsync();
+                ViewBag.Clientes = clientes;
 
                 return View(proyecto);
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
-                return View();
+                TempData["ErrorMessage"] = $"Error al cargar el proyecto para editar: {ex.Message}";
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -164,22 +195,31 @@ namespace TechSolutions_program.Controllers
         {
             if (id != proyecto.Id)
             {
-                return BadRequest();
+                TempData["ErrorMessage"] = "Error de validación: ID de proyecto no coincide.";
+                return RedirectToAction(nameof(Index));
             }
 
             if (!ModelState.IsValid)
             {
+                // Recargar clientes en caso de error
+                var clientes = await _proyectoService.GetClientesAsync();
+                ViewBag.Clientes = clientes;
+                TempData["ErrorMessage"] = "Por favor, corrija los errores en el formulario.";
                 return View(proyecto);
             }
 
             try
             {
                 await _proyectoService.ActualizarAsync(proyecto);
+                TempData["SuccessMessage"] = $"El proyecto '{proyecto.Nombre}' se actualizó exitosamente.";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
+                // Recargar clientes en caso de error
+                var clientes = await _proyectoService.GetClientesAsync();
+                ViewBag.Clientes = clientes;
+                TempData["ErrorMessage"] = $"Error al actualizar el proyecto: {ex.Message}";
                 return View(proyecto);
             }
         }
@@ -199,15 +239,16 @@ namespace TechSolutions_program.Controllers
                 var proyecto = await _proyectoService.GetByIdAsync(id);
                 if (proyecto == null)
                 {
-                    return NotFound();
+                    TempData["ErrorMessage"] = "El proyecto solicitado no existe.";
+                    return RedirectToAction(nameof(Index));
                 }
 
                 return View(proyecto);
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
-                return View();
+                TempData["ErrorMessage"] = $"Error al cargar el proyecto para eliminar: {ex.Message}";
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -225,14 +266,17 @@ namespace TechSolutions_program.Controllers
         {
             try
             {
+                var proyecto = await _proyectoService.GetByIdAsync(id);
+                var nombreProyecto = proyecto?.Nombre ?? $"ID {id}";
+                
                 await _proyectoService.EliminarAsync(id);
+                TempData["SuccessMessage"] = $"El proyecto '{nombreProyecto}' se eliminó exitosamente.";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
-                var proyecto = await _proyectoService.GetByIdAsync(id);
-                return View(proyecto);
+                TempData["ErrorMessage"] = $"Error al eliminar el proyecto: {ex.Message}";
+                return RedirectToAction(nameof(Index));
             }
         }
     }

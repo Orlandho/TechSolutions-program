@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace TechSolutions_program.Models
 {
@@ -39,20 +40,27 @@ namespace TechSolutions_program.Models
         /// </summary>
         [Required(ErrorMessage = "El nombre del proyecto es obligatorio")]
         [StringLength(100, ErrorMessage = "El nombre no puede superar los 100 caracteres")]
-        public string Nombre { get; set; }
+        public string Nombre { get; set; } = string.Empty;
 
         /// <summary>
-        /// Identificación del cliente que solicita el proyecto
-        /// Usado en: Filtros y reportes de proyectos por cliente
+        /// Descripción detallada del proyecto
+        /// Usado en: Detalles del proyecto y reportes
+        /// </summary>
+        [StringLength(500)]
+        public string? Descripcion { get; set; }
+
+        /// <summary>
+        /// ID del cliente que solicita el proyecto
+        /// Usado en: Relación con la entidad Cliente
         /// </summary>
         [Required(ErrorMessage = "Debe especificar un cliente")]
-        public string Cliente { get; set; }
+        public int ClienteId { get; set; }
 
         /// <summary>
         /// Fecha de inicio del proyecto
         /// Usado en: Cálculo de duración y validación de cronograma
         /// </summary>
-        [Required]
+        [Required(ErrorMessage = "La fecha de inicio es obligatoria")]
         [DataType(DataType.Date)]
         [Display(Name = "Fecha de Inicio")]
         public DateTime FechaInicio { get; set; }
@@ -61,6 +69,7 @@ namespace TechSolutions_program.Models
         /// Fecha estimada de finalización del proyecto
         /// Usado en: Dashboard para determinar proyectos con retraso
         /// </summary>
+        [Required(ErrorMessage = "La fecha fin estimada es obligatoria")]
         [DataType(DataType.Date)]
         [Display(Name = "Fecha Fin Estimada")]
         public DateTime FechaFinEstimada { get; set; }
@@ -69,7 +78,7 @@ namespace TechSolutions_program.Models
         /// Presupuesto total asignado al proyecto
         /// Usado en: Reportes financieros y cálculos de rentabilidad
         /// </summary>
-        [Required]
+        [Required(ErrorMessage = "El presupuesto es obligatorio")]
         [Range(0, 999999999, ErrorMessage = "El presupuesto debe ser un valor positivo")]
         [Column(TypeName = "decimal(18, 2)")]
         public decimal Presupuesto { get; set; }
@@ -78,21 +87,31 @@ namespace TechSolutions_program.Models
         /// Estado actual del proyecto: Planificación, En Desarrollo, Finalizado
         /// Usado en: Dashboard y filtros de proyectos
         /// </summary>
-        [Required]
+        [Required(ErrorMessage = "El estado es obligatorio")]
         public string Estado { get; set; } = "Planificación";
 
         /// <summary>
         /// Prioridad del proyecto: Baja, Media, Alta
         /// Usado en: Ordenamiento y gestión de recursos
         /// </summary>
-        [Required]
+        [Required(ErrorMessage = "La prioridad es obligatoria")]
         public string Prioridad { get; set; } = "Media";
+
+        /// <summary>
+        /// Navegación al cliente propietario del proyecto
+        /// Usado en: Vistas de detalle para mostrar información del cliente
+        /// NOTA: Esta propiedad NO se valida en formularios, solo ClienteId
+        /// </summary>
+        [ForeignKey("ClienteId")]
+        [BindNever] // No vincular en model binding para evitar validación
+        public virtual Cliente? Cliente { get; set; }
 
         /// <summary>
         /// Colección de tareas asociadas a este proyecto
         /// Usado en: Detalles del proyecto para mostrar tareas asignadas
+        /// NOTA: Esta propiedad NO se valida en formularios
         /// </summary>
-        // Relación: Un proyecto tiene muchas tareas
-        public virtual ICollection<Tarea> Tareas { get; set; }
+        [BindNever] // No vincular en model binding para evitar validación
+        public virtual ICollection<Tarea>? Tareas { get; set; }
     }
 }

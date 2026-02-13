@@ -83,5 +83,17 @@ namespace TechSolutions_program.Services.Implementations
             _dbContext.Proyectos.Remove(proyecto);
             await _dbContext.SaveChangesAsync();
         }
+
+        /// <summary>
+        /// Obtiene la lista de todos los clientes para dropdowns
+        /// Llamado desde: ProyectosController.Create(), Edit()
+        /// </summary>
+        public async Task<IEnumerable<Cliente>> GetClientesAsync()
+        {
+            return await _dbContext.Clientes
+                .OrderBy(c => c.RazonSocial)
+                .AsNoTracking()
+                .ToListAsync();
+        }
     }
 }
