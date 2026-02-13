@@ -4,7 +4,9 @@ using TechSolutions_program.Models;
 
 namespace TechSolutions_program.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+
+    // CAMBIO IMPORTANTE: Heredamos de IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : IdentityDbContext<Usuario>
     {
 
         /*
@@ -24,14 +26,16 @@ namespace TechSolutions_program.Data
          * ====================================================================================
          */
 
+        // CAMBIO CRÍTICO: Heredamos de IdentityDbContext<Usuario>
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
 
-        // ESTO ES VITAL: Le dice a la BD que cree la tabla Proyectos
         public DbSet<Proyecto> Proyectos { get; set; }
         public DbSet<Tarea> Tareas { get; set; }
-
+        public DbSet<Cliente> Clientes { get; set; }
+        public DbSet<Reporte> Reportes { get; set; }
+        // No necesitas 'DbSet<Usuario>' porque Identity ya lo incluye internamente
     }
 }

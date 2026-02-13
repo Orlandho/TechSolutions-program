@@ -1,4 +1,4 @@
-﻿/*
+/*
  * ====================================================================================
  * CAPA DE NEGOCIO: SERVICIO DE IDENTIDAD Y CONTROL DE ACCESO (RBAC)
  * ====================================================================================
@@ -18,8 +18,7 @@
  * ====================================================================================
  */
 
-
-namespace TechSolutions_program.Services
+namespace TechSolutions_program.Services.Implementations
 {
     public class IdentityService
     {

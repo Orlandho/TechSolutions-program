@@ -1,6 +1,9 @@
-﻿namespace TechSolutions_program.Models
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
+
+namespace TechSolutions_program.Models
 {
-    public class Usuario
+    public class Usuario : IdentityUser
     {
 
         /*
@@ -18,6 +21,16 @@
          * 2. Hashing: Soporta el requisito de almacenar contraseñas encriptadas.
          * ====================================================================================
          */
+
+
+        [Required]
+        [StringLength(100)]
+        public string NombreCompleto { get; set; }
+
+        public string? CodigoEmpleado { get; set; } // Opcional
+
+        // Aquí podríamos relacionar al usuario con sus tareas asignadas
+        public virtual ICollection<Tarea> TareasAsignadas { get; set; }
 
     }
 }

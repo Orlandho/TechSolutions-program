@@ -1,6 +1,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TechSolutions_program.Data;
+using TechSolutions_program.Data.Repositories;
+using TechSolutions_program.Models;
+using TechSolutions_program.Services.Implementations;
+using TechSolutions_program.Services.Interfaces;
+using TechSolutions_program.Services.Strategies;
 
 namespace TechSolutions_program
 {
@@ -16,8 +21,15 @@ namespace TechSolutions_program
                 options.UseSqlServer(connectionString));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-            builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            builder.Services.AddDefaultIdentity<Usuario>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+            builder.Services.AddScoped<IProyectoService, ProyectoService>();
+            builder.Services.AddScoped<ITareaService, TareaService>();
+            builder.Services.AddScoped<IReporteService, ReporteService>();
+            builder.Services.AddScoped<IReporteStrategy, PdfReporteStrategy>();
+            builder.Services.AddScoped<IReporteStrategy, ExcelReporteStrategy>();
+            builder.Services.AddScoped<IdentityService>();
+            builder.Services.AddScoped<IProyectoRepository, ProyectoRepository>();
             builder.Services.AddControllersWithViews();
 
             var app = builder.Build();
@@ -29,7 +41,7 @@ namespace TechSolutions_program
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/Autenticacion/Login");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
@@ -42,7 +54,7 @@ namespace TechSolutions_program
             app.MapStaticAssets();
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}")
+                pattern: "{controller=Autenticacion}/{action=Login}/{id?}")
                 .WithStaticAssets();
             app.MapRazorPages()
                .WithStaticAssets();

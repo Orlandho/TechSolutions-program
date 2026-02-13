@@ -1,6 +1,6 @@
 ﻿namespace TechSolutions_program.Data.Repositories
 {
-    public class ProyectoRepository
+    public class ProyectoRepository : IProyectoRepository
     {
 
         /*
