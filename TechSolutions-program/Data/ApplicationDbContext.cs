@@ -29,9 +29,8 @@ namespace TechSolutions_program.Data
         {
         }
 
-        // ESTO ES VITAL: Le dice a la BD que cree la tabla Proyectos
+        // Registro de las tablas para Entity Framework
         public DbSet<Proyecto> Proyectos { get; set; }
         public DbSet<Tarea> Tareas { get; set; }
-
     }
 }

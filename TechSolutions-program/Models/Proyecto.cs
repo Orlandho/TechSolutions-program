@@ -28,26 +28,34 @@ namespace TechSolutions_program.Models
         [Key]
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "El nombre es obligatorio")]
-        [StringLength(100)]
+        [Required(ErrorMessage = "El nombre del proyecto es obligatorio")]
+        [StringLength(100, ErrorMessage = "El nombre no puede superar los 100 caracteres")]
         public string Nombre { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Debe especificar un cliente")]
         public string Cliente { get; set; }
 
         [Required]
         [DataType(DataType.Date)]
+        [Display(Name = "Fecha de Inicio")]
         public DateTime FechaInicio { get; set; }
 
         [DataType(DataType.Date)]
+        [Display(Name = "Fecha Fin Estimada")]
         public DateTime FechaFinEstimada { get; set; }
 
         [Required]
+        [Range(0, 999999999, ErrorMessage = "El presupuesto debe ser un valor positivo")]
         [Column(TypeName = "decimal(18, 2)")]
         public decimal Presupuesto { get; set; }
 
+        [Required]
         public string Estado { get; set; } = "Planificación";
+
+        [Required]
         public string Prioridad { get; set; } = "Media";
 
+        // Relación: Un proyecto tiene muchas tareas
+        public virtual ICollection<Tarea> Tareas { get; set; }
     }
 }
