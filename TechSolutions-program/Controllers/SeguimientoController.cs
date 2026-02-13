@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using TechSolutions_program.Models;
@@ -24,6 +25,7 @@ namespace TechSolutions_program.Controllers
      * atacando directamente el problema de falta de visibilidad del caso integrador.
      * ====================================================================================
      */
+    [Authorize]
     public class SeguimientoController : Controller
     {
         private readonly IProyectoService _proyectoService;

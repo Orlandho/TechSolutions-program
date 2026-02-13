@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TechSolutions_program.Services.Interfaces;
 
@@ -22,6 +23,7 @@ namespace TechSolutions_program.Controllers
      * datos (Streams), asegurando la escalabilidad del portal de TechSolutions.
      * ====================================================================================
      */
+    [Authorize]
     public class ReportesController : Controller
     {
         private readonly IReporteService _reporteService;

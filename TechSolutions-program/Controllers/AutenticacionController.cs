@@ -88,7 +88,8 @@ namespace TechSolutions_program.Controllers
                     return LocalRedirect(returnUrl);
                 }
 
-                return RedirectToAction("Index", "Proyectos");
+                // CAMBIADO: Redirigir al Dashboard después del login exitoso
+                return RedirectToAction("Index", "Seguimiento");
             }
 
             ModelState.AddModelError(string.Empty, "Intento de inicio de sesión no válido");

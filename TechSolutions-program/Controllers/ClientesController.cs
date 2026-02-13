@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TechSolutions_program.Data;
@@ -7,7 +8,9 @@ namespace TechSolutions_program.Controllers
 {
     /// <summary>
     /// Controlador CRUD para la gestión de clientes de TechSolutions
+    /// Requiere autenticación para acceder a cualquier acción
     /// </summary>
+    [Authorize]
     public class ClientesController : Controller
     {
         private readonly ApplicationDbContext _dbContext;
