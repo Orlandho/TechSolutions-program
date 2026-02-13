@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using TechSolutions_program.Models;
-using TechSolutions_program.Services;
+using TechSolutions_program.Services.Interfaces;
 
 namespace TechSolutions_program.Controllers
 {
@@ -38,25 +38,14 @@ namespace TechSolutions_program.Controllers
             _userManager = userManager;
         }
 
+        [Authorize(Roles = "Lider")]
         [HttpGet]
         public async Task<IActionResult> Index()
         {
             try
             {
-                if (User.IsInRole("Lider"))
-                {
-                    var todas = await _tareaService.GetTareasAsync();
-                    return View(todas);
-                }
-
-                var usuario = await _userManager.GetUserAsync(User);
-                if (usuario == null)
-                {
-                    return Challenge();
-                }
-
-                var asignadas = await _tareaService.GetTareasPorResponsableAsync(usuario.Id);
-                return View(asignadas);
+                var todas = await _tareaService.GetTareasAsync();
+                return View(todas);
             }
             catch (Exception ex)
             {
@@ -65,6 +54,7 @@ namespace TechSolutions_program.Controllers
             }
         }
 
+        [Authorize(Roles = "Desarrollador")]
         [HttpGet]
         public async Task<IActionResult> MisTareas()
         {

@@ -2,6 +2,7 @@ namespace TechSolutions_program.Services.Strategies
 {
     public interface IReporteStrategy
     {
-        Task<ReporteResultado> GenerarAsync(int proyectoId);
+        string Tipo { get; }
+        Task<ReporteResultado> Generar(int proyectoId);
     }
 }

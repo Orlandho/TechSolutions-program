@@ -1,6 +1,6 @@
 using TechSolutions_program.Models;
 
-namespace TechSolutions_program.Services
+namespace TechSolutions_program.Services.Interfaces
 {
     public interface IProyectoService
     {

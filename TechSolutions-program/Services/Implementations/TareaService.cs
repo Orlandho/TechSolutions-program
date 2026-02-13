@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using TechSolutions_program.Data;
 using TechSolutions_program.Models;
+using TechSolutions_program.Services.Interfaces;
 
-namespace TechSolutions_program.Services
+namespace TechSolutions_program.Services.Implementations
 {
     public class TareaService : ITareaService
     {

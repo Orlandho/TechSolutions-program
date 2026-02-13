@@ -2,7 +2,9 @@ namespace TechSolutions_program.Services.Strategies
 {
     public class ExcelReporteStrategy : IReporteStrategy
     {
-        public async Task<ReporteResultado> GenerarAsync(int proyectoId)
+        public string Tipo => "Excel";
+
+        public async Task<ReporteResultado> Generar(int proyectoId)
         {
             var contenido = new MemoryStream();
             await using (var writer = new StreamWriter(contenido, leaveOpen: true))

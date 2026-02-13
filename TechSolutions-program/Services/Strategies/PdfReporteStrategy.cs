@@ -2,7 +2,9 @@ namespace TechSolutions_program.Services.Strategies
 {
     public class PdfReporteStrategy : IReporteStrategy
     {
-        public async Task<ReporteResultado> GenerarAsync(int proyectoId)
+        public string Tipo => "PDF";
+
+        public async Task<ReporteResultado> Generar(int proyectoId)
         {
             var contenido = new MemoryStream();
             await using (var writer = new StreamWriter(contenido, leaveOpen: true))

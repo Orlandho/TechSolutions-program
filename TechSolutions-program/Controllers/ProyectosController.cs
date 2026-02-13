@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TechSolutions_program.Models;
-using TechSolutions_program.Services;
+using TechSolutions_program.Services.Interfaces;
 
 namespace TechSolutions_program.Controllers
 {

@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TechSolutions_program.Data;
+using TechSolutions_program.Data.Repositories;
 using TechSolutions_program.Models;
-using TechSolutions_program.Services;
+using TechSolutions_program.Services.Implementations;
+using TechSolutions_program.Services.Interfaces;
+using TechSolutions_program.Services.Strategies;
 
 namespace TechSolutions_program
 {
@@ -22,6 +25,11 @@ namespace TechSolutions_program
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             builder.Services.AddScoped<IProyectoService, ProyectoService>();
             builder.Services.AddScoped<ITareaService, TareaService>();
+            builder.Services.AddScoped<IReporteService, ReporteService>();
+            builder.Services.AddScoped<IReporteStrategy, PdfReporteStrategy>();
+            builder.Services.AddScoped<IReporteStrategy, ExcelReporteStrategy>();
+            builder.Services.AddScoped<IdentityService>();
+            builder.Services.AddScoped<IProyectoRepository, ProyectoRepository>();
             builder.Services.AddControllersWithViews();
 
             var app = builder.Build();

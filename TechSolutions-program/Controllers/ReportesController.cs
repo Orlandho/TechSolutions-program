@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using TechSolutions_program.Services.Strategies;
+using TechSolutions_program.Services.Interfaces;
 
 namespace TechSolutions_program.Controllers
 {
@@ -24,6 +24,13 @@ namespace TechSolutions_program.Controllers
      */
     public class ReportesController : Controller
     {
+        private readonly IReporteService _reporteService;
+
+        public ReportesController(IReporteService reporteService)
+        {
+            _reporteService = reporteService;
+        }
+
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -34,19 +41,7 @@ namespace TechSolutions_program.Controllers
         [AcceptVerbs("GET", "POST")]
         public async Task<IActionResult> Descargar(string tipoReporte, int proyectoId)
         {
-            IReporteStrategy? strategy = tipoReporte?.ToUpperInvariant() switch
-            {
-                "PDF" => new PdfReporteStrategy(),
-                "EXCEL" => new ExcelReporteStrategy(),
-                _ => null
-            };
-
-            if (strategy == null)
-            {
-                return BadRequest();
-            }
-
-            var resultado = await strategy.GenerarAsync(proyectoId);
+            var resultado = await _reporteService.GenerarAsync(tipoReporte, proyectoId);
             return File(resultado.Contenido, resultado.ContentType, resultado.NombreArchivo);
         }
     }

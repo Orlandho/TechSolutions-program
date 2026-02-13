@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
-using TechSolutions_program.Services;
+using TechSolutions_program.Models;
+using TechSolutions_program.Services.Interfaces;
 
 namespace TechSolutions_program.Controllers
 {
@@ -58,13 +59,5 @@ namespace TechSolutions_program.Controllers
                 return View(new DashboardViewModel());
             }
         }
-    }
-
-    public class DashboardViewModel
-    {
-        public int TotalProyectos { get; set; }
-        public decimal PresupuestoTotal { get; set; }
-        public int TareasPendientes { get; set; }
-        public int TareasCompletadas { get; set; }
     }
 }
