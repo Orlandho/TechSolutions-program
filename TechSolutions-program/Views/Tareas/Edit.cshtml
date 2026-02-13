@@ -1,3 +1,119 @@
-@model TechSolutions_program.Models.Tarea
+@page
+@model TechSolutions_program.Views.Tareas.EditModel
+@{
+    ViewData["Title"] = "Editar Tarea";
+}
+
+@*
+    ====================================================================================
+    VISTA: EDIT DE TAREAS - FORMULARIO DE EDICIÓN
+    ====================================================================================
+    SEGURIDAD: Solo accesible para rol Líder
+    
+    MÉTODOS DEL CONTROLADOR QUE USA ESTA VISTA:
+    
+    1. TareasController.Edit(int id) [GET]
+       - Este método carga la tarea existente y muestra esta vista con sus datos
+       - Se accede desde: <a asp-action="Edit" asp-route-id="@tarea.Id">Editar</a>
+       - Llama a TareaService.GetByIdAsync(id)
+    
+    MÉTODOS QUE DEBES USAR EN ESTA VISTA:
+    
+    2. TareasController.Edit(int id, Tarea tarea) [POST]
+       - Este método procesa el formulario con los cambios
+       - Usa: <form asp-action="Edit" method="post">
+       - CRÍTICO: Incluir el ID como campo oculto:
+         <input asp-for="Id" type="hidden" />
+       - Incluye SIEMPRE: @Html.AntiForgeryToken() o asp-antiforgery="true"
+       - Llama a TareaService.ActualizarAsync(tarea)
+       - El botón submit:
+         <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+    
+    3. TareasController.Index() [GET]
+       - Para el botón "Cancelar"
+       - Usa: <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+       - Regresa a la lista sin guardar cambios
+    
+    CAMPOS QUE DEBE TENER EL FORMULARIO:
+    - Id (OCULTO): <input asp-for="Id" type="hidden" />
+    - Descripcion: <textarea asp-for="Descripcion" class="form-control"></textarea>
+    - Estado: <select asp-for="Estado" class="form-control">
+                <option value="Pendiente">Pendiente</option>
+                <option value="En Progreso">En Progreso</option>
+                <option value="Terminado">Terminado</option>
+              </select>
+    - Prioridad: <select asp-for="Prioridad" class="form-control">
+                   <option value="Baja">Baja</option>
+                   <option value="Media">Media</option>
+                   <option value="Alta">Alta</option>
+                 </select>
+    - Responsable: <input asp-for="Responsable" class="form-control" />
+    - FechaLimite: <input asp-for="FechaLimite" type="date" class="form-control" />
+    - ProyectoId: <select asp-for="ProyectoId" class="form-control">
+                    <!-- Lista de proyectos desde ViewBag -->
+                  </select>
+    
+    POR QUÉ USAR ESTOS MÉTODOS AQUÍ:
+    - El formulario viene pre-llenado con los datos actuales de la tarea (por Edit[GET])
+    - El Líder puede cambiar: descripción, prioridad, responsable, fecha límite
+    - El campo oculto Id es ESENCIAL para que el controlador sepa qué tarea actualizar
+    - Edit[POST] valida y actualiza la tarea en la base de datos
+    - Si hay errores de validación, muestra esta vista con los errores
+    - Si todo es correcto, redirige a Index
+    ====================================================================================
+*@
 
 <h1>Editar Tarea</h1>
+
+<form asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+    <input asp-for="Id" type="hidden" />
+
+    <div class="form-group">
+        <label asp-for="Descripcion"></label>
+        <textarea asp-for="Descripcion" class="form-control"></textarea>
+        <span asp-validation-for="Descripcion" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Estado"></label>
+        <select asp-for="Estado" class="form-control">
+            <option value="Pendiente">Pendiente</option>
+            <option value="En Progreso">En Progreso</option>
+            <option value="Terminado">Terminado</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Prioridad"></label>
+        <select asp-for="Prioridad" class="form-control">
+            <option value="Baja">Baja</option>
+            <option value="Media">Media</option>
+            <option value="Alta">Alta</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Responsable"></label>
+        <input asp-for="Responsable" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="FechaLimite"></label>
+        <input asp-for="FechaLimite" type="date" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ProyectoId"></label>
+        <select asp-for="ProyectoId" class="form-control">
+            <!-- Lista de proyectos desde ViewBag -->
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

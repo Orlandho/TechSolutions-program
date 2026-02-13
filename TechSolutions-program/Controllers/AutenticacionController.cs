@@ -41,6 +41,11 @@ namespace TechSolutions_program.Controllers
             _userManager = userManager;
         }
 
+        /// <summary>
+        /// GET: /Autenticacion/Login
+        /// Muestra el formulario de inicio de sesión
+        /// Usado en: <a asp-controller="Autenticacion" asp-action="Login">Iniciar Sesión</a>
+        /// </summary>
         [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> Login(string? returnUrl = null)
@@ -50,6 +55,12 @@ namespace TechSolutions_program.Controllers
             return View();
         }
 
+        /// <summary>
+        /// POST: /Autenticacion/Login
+        /// Procesa el intento de inicio de sesión del usuario
+        /// Usado en: <form asp-action="Login"> con campos de email y password
+        /// Redirige a la página solicitada o a /Proyectos/Index si login exitoso
+        /// </summary>
         [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -84,6 +95,12 @@ namespace TechSolutions_program.Controllers
             return View();
         }
 
+        /// <summary>
+        /// POST: /Autenticacion/Logout
+        /// Cierra la sesión del usuario actual
+        /// Usado en: <form asp-action="Logout"> con botón "Cerrar Sesión"
+        /// Típicamente en: _LoginPartial.cshtml
+        /// </summary>
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -93,6 +110,11 @@ namespace TechSolutions_program.Controllers
             return RedirectToAction("Login", "Autenticacion");
         }
 
+        /// <summary>
+        /// GET: /Autenticacion/AccessDenied
+        /// Muestra la página de acceso denegado cuando un usuario no tiene permisos
+        /// Redirigido automáticamente por [Authorize(Roles = "...")] cuando fallan permisos
+        /// </summary>
         [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> AccessDenied()

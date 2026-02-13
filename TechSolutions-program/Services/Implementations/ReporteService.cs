@@ -3,6 +3,9 @@ using TechSolutions_program.Services.Strategies;
 
 namespace TechSolutions_program.Services.Implementations
 {
+    /// <summary>
+    /// Servicio para la generación de reportes utilizando el patrón Strategy
+    /// </summary>
     public class ReporteService : IReporteService
     {
         private readonly IEnumerable<IReporteStrategy> _strategies;
@@ -12,6 +15,13 @@ namespace TechSolutions_program.Services.Implementations
             _strategies = strategies;
         }
 
+        /// <summary>
+        /// Genera un reporte del tipo especificado para un proyecto
+        /// Este método es llamado desde ReportesController para generar PDF o Excel
+        /// </summary>
+        /// <param name="tipoReporte">Tipo de reporte: "pdf" o "excel"</param>
+        /// <param name="proyectoId">ID del proyecto para el que se genera el reporte</param>
+        /// <returns>ReporteResultado con los datos binarios del archivo generado</returns>
         public Task<ReporteResultado> GenerarAsync(string tipoReporte, int proyectoId)
         {
             if (string.IsNullOrWhiteSpace(tipoReporte))

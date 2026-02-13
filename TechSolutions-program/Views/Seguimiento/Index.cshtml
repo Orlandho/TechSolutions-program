@@ -1,3 +1,61 @@
+@*
+    ====================================================================================
+    VISTA: DASHBOARD DE CONTROL - SEGUIMIENTO Y MONITOREO
+    ====================================================================================
+    SEGURIDAD: Accesible para todos los usuarios autenticados
+    
+    MÉTODOS DEL CONTROLADOR QUE USA ESTA VISTA:
+    
+    1. SeguimientoController.Index() [GET]
+       - Este método carga los indicadores y muestra esta vista
+       - Se accede con: <a asp-controller="Seguimiento" asp-action="Index">Dashboard</a>
+       - Llama a ProyectoService.GetProyectosAsync() para obtener todos los proyectos
+       - Llama a TareaService.GetTareasAsync() para obtener todas las tareas
+       - Calcula métricas agregadas y las pasa en un DashboardViewModel
+    
+    NO USA MÉTODOS DE FORMULARIO:
+    - Esta vista es SOLO DE LECTURA, no tiene formularios
+    - Solo muestra información estadística y métricas
+    
+    MÉTODOS OPCIONALES PARA ENLACES:
+    
+    2. ProyectosController.Index() [GET]
+       - Para un enlace "Ver Proyectos"
+       - Usa: <a asp-controller="Proyectos" asp-action="Index">Ver todos los proyectos</a>
+    
+    3. TareasController.Index() o TareasController.MisTareas() [GET]
+       - Para enlaces a las tareas
+       - Usa: <a asp-controller="Tareas" asp-action="Index">Ver todas las tareas</a> (Líderes)
+       - Usa: <a asp-controller="Tareas" asp-action="MisTareas">Ver mis tareas</a> (Desarrolladores)
+    
+    DATOS DEL MODELO A MOSTRAR (DashboardViewModel):
+    
+    - @Model.TotalProyectos - Cantidad total de proyectos en el sistema
+      * Se calcula con: proyectos.Count()
+      * Muestra: <h3>@Model.TotalProyectos</h3> proyectos activos
+    
+    - @Model.PresupuestoTotal - Suma de todos los presupuestos de proyectos
+      * Se calcula con: proyectos.Sum(p => p.Presupuesto)
+      * Muestra: <h3>S/ @Model.PresupuestoTotal.ToString("N2")</h3>
+    
+    - @Model.TareasPendientes - Cantidad de tareas con estado "Pendiente"
+      * Se calcula con: tareas.Count(t => t.Estado == "Pendiente")
+      * Muestra: <span class="badge bg-warning">@Model.TareasPendientes pendientes</span>
+    
+    - @Model.TareasCompletadas - Cantidad de tareas finalizadas
+      * Se calcula con: tareas.Count(t => t.Estado == "Terminado" || t.Estado == "Finalizado")
+      * Muestra: <span class="badge bg-success">@Model.TareasCompletadas completadas</span>
+    
+    POR QUÉ USAR ESTE MÉTODO AQUÍ:
+    - Esta vista muestra el estado general del sistema en tiempo real
+    - Es útil para que Líderes tomen decisiones basadas en datos
+    - Los Desarrolladores pueden ver el progreso general
+    - Los cálculos se hacen en el controlador (SeguimientoController.Index)
+    - El controlador usa los servicios para obtener datos de proyectos y tareas
+    - Luego calcula las métricas y las empaqueta en un DashboardViewModel
+    - Esta vista solo se encarga de MOSTRAR esos datos calculados
+    ====================================================================================
+*@
 @model TechSolutions_program.Models.DashboardViewModel
 
 <h1>Dashboard de Control</h1>

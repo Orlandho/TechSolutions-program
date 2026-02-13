@@ -37,6 +37,11 @@ namespace TechSolutions_program.Controllers
             _proyectoService = proyectoService;
         }
 
+        /// <summary>
+        /// GET: /Proyectos/Index
+        /// Lista todos los proyectos disponibles
+        /// Usado en: <a asp-controller="Proyectos" asp-action="Index">Ver Proyectos</a>
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -52,6 +57,11 @@ namespace TechSolutions_program.Controllers
             }
         }
 
+        /// <summary>
+        /// GET: /Proyectos/Details/5
+        /// Muestra los detalles completos de un proyecto específico
+        /// Usado en: <a asp-action="Details" asp-route-id="@proyecto.Id">Ver Detalles</a>
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
@@ -72,6 +82,12 @@ namespace TechSolutions_program.Controllers
             }
         }
 
+        /// <summary>
+        /// GET: /Proyectos/Create
+        /// Muestra el formulario para crear un nuevo proyecto
+        /// Solo accesible para roles: Lider, Administrador
+        /// Usado en: <a asp-action="Create">Nuevo Proyecto</a>
+        /// </summary>
         [Authorize(Roles = "Lider,Administrador")]
         [HttpGet]
         public async Task<IActionResult> Create()
@@ -80,6 +96,12 @@ namespace TechSolutions_program.Controllers
             return View();
         }
 
+        /// <summary>
+        /// POST: /Proyectos/Create
+        /// Procesa el formulario de creación de proyecto
+        /// Solo accesible para roles: Lider, Administrador
+        /// Usado en: <form asp-action="Create"> con botón submit
+        /// </summary>
         [Authorize(Roles = "Lider,Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -102,6 +124,12 @@ namespace TechSolutions_program.Controllers
             }
         }
 
+        /// <summary>
+        /// GET: /Proyectos/Edit/5
+        /// Muestra el formulario de edición de un proyecto existente
+        /// Solo accesible para roles: Lider, Administrador
+        /// Usado en: <a asp-action="Edit" asp-route-id="@proyecto.Id">Editar</a>
+        /// </summary>
         [Authorize(Roles = "Lider,Administrador")]
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
@@ -123,6 +151,12 @@ namespace TechSolutions_program.Controllers
             }
         }
 
+        /// <summary>
+        /// POST: /Proyectos/Edit/5
+        /// Procesa el formulario de edición de proyecto
+        /// Solo accesible para roles: Lider, Administrador
+        /// Usado en: <form asp-action="Edit"> con botón "Guardar Cambios"
+        /// </summary>
         [Authorize(Roles = "Lider,Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -150,6 +184,12 @@ namespace TechSolutions_program.Controllers
             }
         }
 
+        /// <summary>
+        /// GET: /Proyectos/Delete/5
+        /// Muestra la página de confirmación para eliminar un proyecto
+        /// Solo accesible para roles: Lider, Administrador
+        /// Usado en: <a asp-action="Delete" asp-route-id="@proyecto.Id">Eliminar</a>
+        /// </summary>
         [Authorize(Roles = "Lider,Administrador")]
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
@@ -171,6 +211,12 @@ namespace TechSolutions_program.Controllers
             }
         }
 
+        /// <summary>
+        /// POST: /Proyectos/Delete/5
+        /// Elimina permanentemente un proyecto de la base de datos
+        /// Solo accesible para roles: Lider, Administrador
+        /// Usado en: <form asp-action="Delete"> con botón "Confirmar Eliminación"
+        /// </summary>
         [Authorize(Roles = "Lider,Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]

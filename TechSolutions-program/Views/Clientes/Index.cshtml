@@ -1,3 +1,45 @@
 @model IEnumerable<TechSolutions_program.Models.Cliente>
 
 <h1>Clientes</h1>
+
+@*
+    ====================================================================================
+    VISTA: INDEX DE CLIENTES - LISTADO MAESTRO
+    ====================================================================================
+    MÉTODOS DEL CONTROLADOR QUE USA ESTA VISTA:
+    
+    1. ClientesController.Index() [GET]
+       - Carga esta vista con la lista de todos los clientes
+       - Se accede con: <a asp-controller="Clientes" asp-action="Index">Ver Clientes</a>
+    
+    MÉTODOS QUE DEBES USAR EN ESTA VISTA:
+    
+    2. ClientesController.Create() [GET]
+       - Para mostrar el botón "Nuevo Cliente"
+       - Usa: <a asp-action="Create" class="btn btn-primary">Nuevo Cliente</a>
+       - Abre el formulario de creación
+    
+    3. ClientesController.Details() [GET]
+       - Para ver los detalles de un cliente específico
+       - Usa: <a asp-action="Details" asp-route-id="@cliente.Id">Ver Detalles</a>
+       - Muestra la información completa del cliente
+    
+    4. ClientesController.Edit() [GET]
+       - Para editar un cliente existente
+       - Usa: <a asp-action="Edit" asp-route-id="@cliente.Id">Editar</a>
+       - Abre el formulario de edición
+    
+    5. ClientesController.Delete() [GET]
+       - Para eliminar un cliente
+       - Usa: <a asp-action="Delete" asp-route-id="@cliente.Id">Eliminar</a>
+       - Abre la página de confirmación de eliminación
+    
+    POR QUÉ USAR ESTOS MÉTODOS AQUÍ:
+    - Esta es la vista de listado principal donde el usuario ve todos los clientes
+    - Necesita botones/enlaces para realizar operaciones CRUD sobre cada cliente
+    - asp-action especifica el método del controlador a llamar
+    - asp-route-id pasa el ID del cliente al método del controlador
+    ====================================================================================
+*@
+
+---

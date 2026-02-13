@@ -30,28 +30,48 @@ namespace TechSolutions_program.Services.Implementations
             _dbContext = dbContext;
         }
 
+        /// <summary>
+        /// Obtiene la lista de todos los proyectos
+        /// Llamado desde: ProyectosController.Index() y SeguimientoController.Index()
+        /// </summary>
         public async Task<IEnumerable<Proyecto>> GetProyectosAsync()
         {
             return await _dbContext.Proyectos.AsNoTracking().ToListAsync();
         }
 
+        /// <summary>
+        /// Obtiene un proyecto específico por su ID
+        /// Llamado desde: ProyectosController.Details(), Edit(), Delete()
+        /// </summary>
         public async Task<Proyecto?> GetByIdAsync(int id)
         {
             return await _dbContext.Proyectos.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
         }
 
+        /// <summary>
+        /// Crea un nuevo proyecto en la base de datos
+        /// Llamado desde: ProyectosController.Create() [POST]
+        /// </summary>
         public async Task CrearAsync(Proyecto proyecto)
         {
             _dbContext.Proyectos.Add(proyecto);
             await _dbContext.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Actualiza un proyecto existente
+        /// Llamado desde: ProyectosController.Edit() [POST]
+        /// </summary>
         public async Task ActualizarAsync(Proyecto proyecto)
         {
             _dbContext.Proyectos.Update(proyecto);
             await _dbContext.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Elimina un proyecto de la base de datos
+        /// Llamado desde: ProyectosController.DeleteConfirmed() [POST]
+        /// </summary>
         public async Task EliminarAsync(int id)
         {
             var proyecto = await _dbContext.Proyectos.FirstOrDefaultAsync(p => p.Id == id);

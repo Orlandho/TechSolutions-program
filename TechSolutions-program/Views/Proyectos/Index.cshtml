@@ -1,3 +1,59 @@
 @model IEnumerable<TechSolutions_program.Models.Proyecto>
 
 <h1>Proyectos</h1>
+
+@*
+    ====================================================================================
+    VISTA: INDEX DE PROYECTOS - LISTADO MAESTRO
+    ====================================================================================
+    MÉTODOS DEL CONTROLADOR QUE USA ESTA VISTA:
+    
+    1. ProyectosController.Index() [GET]
+       - Carga esta vista con la lista de todos los proyectos del sistema
+       - Se accede con: <a asp-controller="Proyectos" asp-action="Index">Ver Proyectos</a>
+    
+    MÉTODOS QUE DEBES USAR EN ESTA VISTA:
+    
+    2. ProyectosController.Create() [GET]
+       - Para mostrar el botón "Nuevo Proyecto" (SOLO para Líder/Administrador)
+       - Usa: <a asp-action="Create" class="btn btn-primary">Nuevo Proyecto</a>
+       - Abre el formulario de creación
+       - NOTA: Este botón debe mostrarse SOLO si el usuario tiene rol Líder/Administrador
+    
+    3. ProyectosController.Details(int id) [GET]
+       - Para ver los detalles completos de un proyecto
+       - Usa: <a asp-action="Details" asp-route-id="@proyecto.Id">Ver Detalles</a>
+       - Muestra información detallada: tareas, presupuesto, fechas, etc.
+    
+    4. ProyectosController.Edit(int id) [GET]
+       - Para editar un proyecto existente (SOLO para Líder/Administrador)
+       - Usa: <a asp-action="Edit" asp-route-id="@proyecto.Id">Editar</a>
+       - Abre el formulario de edición
+    
+    5. ProyectosController.Delete(int id) [GET]
+       - Para eliminar un proyecto (SOLO para Líder/Administrador)
+       - Usa: <a asp-action="Delete" asp-route-id="@proyecto.Id">Eliminar</a>
+       - Abre la confirmación de eliminación
+    
+    6. ReportesController.Descargar(string tipoReporte, int proyectoId) [GET/POST]
+       - Para generar reportes PDF o Excel de un proyecto
+       - Usa: <a asp-controller="Reportes" asp-action="Descargar" 
+                  asp-route-tipoReporte="pdf" asp-route-proyectoId="@proyecto.Id">PDF</a>
+       - Usa: <a asp-controller="Reportes" asp-action="Descargar" 
+                  asp-route-tipoReporte="excel" asp-route-proyectoId="@proyecto.Id">Excel</a>
+    
+    DATOS DEL MODELO A MOSTRAR:
+    - @proyecto.Nombre - Nombre del proyecto
+    - @proyecto.Cliente - Cliente asociado
+    - @proyecto.Presupuesto - Presupuesto total
+    - @proyecto.Estado - Estado actual (Planificación, En Desarrollo, Finalizado)
+    - @proyecto.FechaInicio y @proyecto.FechaFinEstimada
+    - @proyecto.Prioridad - Prioridad (Baja, Media, Alta)
+    
+    POR QUÉ USAR ESTOS MÉTODOS AQUÍ:
+    - Esta es la vista principal de gestión de proyectos
+    - Los Desarrolladores solo pueden VER (Details), no Create/Edit/Delete
+    - Los Líderes/Administradores tienen acceso completo CRUD
+    - Los reportes están disponibles para todos los roles
+    ====================================================================================
+*@

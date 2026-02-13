@@ -1,5 +1,9 @@
 ﻿namespace TechSolutions_program.Data.Repositories
 {
+    /// <summary>
+    /// Implementación del patrón Repository para la entidad Proyecto
+    /// Proporciona acceso a datos de proyectos con una capa de abstracción
+    /// </summary>
     public class ProyectoRepository : IProyectoRepository
     {
 

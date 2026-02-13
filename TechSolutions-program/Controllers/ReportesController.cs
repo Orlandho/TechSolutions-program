@@ -31,6 +31,11 @@ namespace TechSolutions_program.Controllers
             _reporteService = reporteService;
         }
 
+        /// <summary>
+        /// GET: /Reportes/Index
+        /// Muestra la página principal de reportes con opciones de generación
+        /// Esta acción es llamada cuando el usuario accede a la vista de reportes
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -38,6 +43,14 @@ namespace TechSolutions_program.Controllers
             return View();
         }
 
+        /// <summary>
+        /// GET/POST: /Reportes/Descargar?tipoReporte=pdf&proyectoId=1
+        /// Genera y descarga un reporte en el formato especificado (PDF o Excel)
+        /// Este método es invocado desde botones/links en las vistas (ej: asp-action="Descargar")
+        /// Usa: <a asp-action="Descargar" asp-route-tipoReporte="pdf" asp-route-proyectoId="@Model.Id">Descargar PDF</a>
+        /// </summary>
+        /// <param name="tipoReporte">Tipo de reporte: "pdf" o "excel"</param>
+        /// <param name="proyectoId">ID del proyecto a reportar</param>
         [AcceptVerbs("GET", "POST")]
         public async Task<IActionResult> Descargar(string tipoReporte, int proyectoId)
         {

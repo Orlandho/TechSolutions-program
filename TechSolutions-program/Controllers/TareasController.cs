@@ -38,6 +38,11 @@ namespace TechSolutions_program.Controllers
             _userManager = userManager;
         }
 
+        /// <summary>
+        /// GET: /Tareas/Index
+        /// Lista todas las tareas del sistema (solo para Líderes)
+        /// Usado en: <a asp-controller="Tareas" asp-action="Index">Gestionar Tareas</a>
+        /// </summary>
         [Authorize(Roles = "Lider")]
         [HttpGet]
         public async Task<IActionResult> Index()
@@ -54,6 +59,11 @@ namespace TechSolutions_program.Controllers
             }
         }
 
+        /// <summary>
+        /// GET: /Tareas/MisTareas
+        /// Muestra solo las tareas asignadas al desarrollador actual
+        /// Usado en: <a asp-action="MisTareas">Mis Tareas</a>
+        /// </summary>
         [Authorize(Roles = "Desarrollador")]
         [HttpGet]
         public async Task<IActionResult> MisTareas()
@@ -76,6 +86,11 @@ namespace TechSolutions_program.Controllers
             }
         }
 
+        /// <summary>
+        /// GET: /Tareas/Create
+        /// Muestra el formulario para crear una nueva tarea (solo para Líderes)
+        /// Usado en: <a asp-action="Create">Nueva Tarea</a>
+        /// </summary>
         [Authorize(Roles = "Lider")]
         [HttpGet]
         public async Task<IActionResult> Create()
@@ -84,6 +99,11 @@ namespace TechSolutions_program.Controllers
             return View();
         }
 
+        /// <summary>
+        /// POST: /Tareas/Create
+        /// Procesa el formulario de creación de tarea (solo para Líderes)
+        /// Usado en: <form asp-action="Create"> con botón submit
+        /// </summary>
         [Authorize(Roles = "Lider")]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -106,6 +126,11 @@ namespace TechSolutions_program.Controllers
             }
         }
 
+        /// <summary>
+        /// GET: /Tareas/Edit/5
+        /// Muestra el formulario de edición de una tarea (solo para Líderes)
+        /// Usado en: <a asp-action="Edit" asp-route-id="@tarea.Id">Editar</a>
+        /// </summary>
         [Authorize(Roles = "Lider")]
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
@@ -127,6 +152,11 @@ namespace TechSolutions_program.Controllers
             }
         }
 
+        /// <summary>
+        /// POST: /Tareas/Edit/5
+        /// Procesa el formulario de edición de tarea (solo para Líderes)
+        /// Usado en: <form asp-action="Edit"> con botón "Guardar Cambios"
+        /// </summary>
         [Authorize(Roles = "Lider")]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -154,6 +184,11 @@ namespace TechSolutions_program.Controllers
             }
         }
 
+        /// <summary>
+        /// GET: /Tareas/Delete/5
+        /// Muestra la confirmación para eliminar una tarea (solo para Líderes)
+        /// Usado en: <a asp-action="Delete" asp-route-id="@tarea.Id">Eliminar</a>
+        /// </summary>
         [Authorize(Roles = "Lider")]
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
@@ -175,6 +210,11 @@ namespace TechSolutions_program.Controllers
             }
         }
 
+        /// <summary>
+        /// POST: /Tareas/Delete/5
+        /// Elimina permanentemente una tarea (solo para Líderes)
+        /// Usado en: <form asp-action="Delete"> con botón "Confirmar Eliminación"
+        /// </summary>
         [Authorize(Roles = "Lider")]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -194,6 +234,13 @@ namespace TechSolutions_program.Controllers
             }
         }
 
+        /// <summary>
+        /// POST: /Tareas/CambiarEstado
+        /// Cambia el estado de una tarea (Pendiente, En Progreso, Finalizado)
+        /// Los Desarrolladores pueden cambiar el estado de sus tareas asignadas
+        /// Usado en: <form asp-action="CambiarEstado" asp-route-id="@tarea.Id">
+        ///           <button type="submit" name="nuevoEstado" value="En Progreso">
+        /// </summary>
         [Authorize(Roles = "Desarrollador,Lider")]
         [HttpPost]
         [ValidateAntiForgeryToken]

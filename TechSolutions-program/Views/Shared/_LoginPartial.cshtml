@@ -1,4 +1,59 @@
-﻿@using Microsoft.AspNetCore.Identity
+﻿@*
+    ====================================================================================
+    VISTA PARCIAL: _LoginPartial - BARRA DE AUTENTICACIÓN
+    ====================================================================================
+    USO: Esta vista parcial se incluye en _Layout.cshtml
+    PROPÓSITO: Mostrar el estado de autenticación del usuario y opciones de login/logout
+    
+    MÉTODOS DEL CONTROLADOR QUE USA ESTA VISTA:
+    
+    1. AutenticacionController.Login() [GET]
+       - Muestra el enlace "Login" cuando el usuario NO está autenticado
+       - Usa: <a asp-controller="Autenticacion" asp-action="Login">Login</a>
+       - Redirige a la página de inicio de sesión
+    
+    2. AutenticacionController.Logout() [POST]
+       - Procesa el cierre de sesión cuando el usuario hace clic en "Logout"
+       - Usa: <form asp-controller="Autenticacion" asp-action="Logout" method="post">
+               <button type="submit">Logout</button>
+             </form>
+       - IMPORTANTE: Debe ser un formulario POST por seguridad (no un simple enlace)
+       - Llama a SignInManager.SignOutAsync() para cerrar la sesión
+       - Elimina la cookie de autenticación
+       - Redirige al Login después de cerrar sesión
+    
+    3. AutenticacionController.AccessDenied() [GET]
+       - Actualmente muestra el perfil del usuario (cambiar el enlace a otra acción si quieres)
+       - Usa: <a asp-action="AccessDenied">Hello @User.Identity?.Name!</a>
+    
+    SERVICIOS INYECTADOS:
+    - @inject SignInManager<Usuario> SignInManager
+      * Permite verificar si el usuario está autenticado
+      * SignInManager.IsSignedIn(User) devuelve true/false
+    
+    - @inject UserManager<Usuario> UserManager
+      * Permite acceder a información del usuario actual
+      * Puede obtener el usuario completo con: await UserManager.GetUserAsync(User)
+    
+    CÓMO FUNCIONA:
+    1. Si el usuario está autenticado (SignInManager.IsSignedIn(User)):
+       - Muestra: "Hello [NombreUsuario]!" y un botón "Logout"
+       - @User.Identity?.Name obtiene el nombre del usuario autenticado
+       - El botón Logout es un formulario POST que cierra la sesión
+    
+    2. Si el usuario NO está autenticado:
+       - Muestra: un enlace "Login"
+       - Al hacer clic, redirige a /Autenticacion/Login
+    
+    POR QUÉ USAR ESTOS MÉTODOS AQUÍ:
+    - Esta vista parcial aparece en TODAS las páginas (incluida en _Layout.cshtml)
+    - Permite al usuario saber si está autenticado y quién es
+    - El botón Logout debe ser POST para prevenir ataques CSRF
+    - No debe usar enlaces GET para Logout por seguridad
+    - Esta es la forma estándar de ASP.NET Core Identity para login/logout
+    ====================================================================================
+*@
+@using Microsoft.AspNetCore.Identity
 @using TechSolutions_program.Models
 @inject SignInManager<Usuario> SignInManager
 @inject UserManager<Usuario> UserManager

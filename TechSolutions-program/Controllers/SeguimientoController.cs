@@ -35,14 +35,22 @@ namespace TechSolutions_program.Controllers
             _tareaService = tareaService;
         }
 
+        /// <summary>
+        /// GET: /Seguimiento/Index
+        /// Muestra el dashboard con indicadores de estado del sistema
+        /// Calcula: Total de proyectos, presupuesto acumulado, tareas pendientes/completadas
+        /// Usado en: <a asp-controller="Seguimiento" asp-action="Index">Dashboard</a>
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> Index()
         {
             try
             {
+                // Obtiene la lista de proyectos y tareas de los servicios respectivos
                 var proyectos = await _proyectoService.GetProyectosAsync();
                 var tareas = await _tareaService.GetTareasAsync();
 
+                // Crea el modelo para la vista del dashboard
                 var model = new DashboardViewModel
                 {
                     TotalProyectos = proyectos.Count(),
@@ -51,10 +59,12 @@ namespace TechSolutions_program.Controllers
                     TareasCompletadas = tareas.Count(t => t.Estado == "Terminado" || t.Estado == "Finalizado")
                 };
 
+                // Retorna la vista con el modelo creado
                 return View(model);
             }
             catch (Exception ex)
             {
+                // En caso de error, agrega el mensaje al estado del modelo y retorna la vista vacía
                 ModelState.AddModelError(string.Empty, ex.Message);
                 return View(new DashboardViewModel());
             }

@@ -1,3 +1,114 @@
+@*
+    ====================================================================================
+    VISTA: MIS TAREAS - LISTADO PERSONAL (SOLO PARA DESARROLLADORES)
+    ====================================================================================
+    SEGURIDAD: Solo accesible para rol Desarrollador
+    
+    MÉTODOS DEL CONTROLADOR QUE USA ESTA VISTA:
+    
+    1. TareasController.MisTareas() [GET]
+       - Carga esta vista con SOLO las tareas asignadas al desarrollador actual
+       - Se accede con: <a asp-action="MisTareas">Mis Tareas</a>
+       - Obtiene el ID del usuario actual con UserManager
+       - Llama a TareaService.GetTareasPorResponsableAsync(usuarioId)
+    
+    MÉTODOS QUE DEBES USAR EN ESTA VISTA:
+    
+    2. TareasController.CambiarEstado(int id, string nuevoEstado) [POST]
+       - Para cambiar el estado de una tarea asignada al desarrollador
+       - Este es el método MÁS IMPORTANTE para los desarrolladores
+       - Usa: <form asp-action="CambiarEstado" asp-route-id="@tarea.Id" method="post">
+                <button type="submit" name="nuevoEstado" value="En Progreso" 
+                        class="btn btn-warning">Iniciar Tarea</button>
+                <button type="submit" name="nuevoEstado" value="Finalizado" 
+                        class="btn btn-success">Marcar Completa</button>
+              </form>
+       - IMPORTANTE: Incluir @Html.AntiForgeryToken() dentro del form
+       - Llama a TareaService.CambiarEstadoAsync(id, nuevoEstado)
+       - Actualiza el estado en la base de datos
+    
+    DATOS DEL MODELO A MOSTRAR:
+    - @tarea.Descripcion - Qué debe hacer el desarrollador
+    - @tarea.Estado - Estado actual (Pendiente, En Progreso, Terminado)
+    - @tarea.Prioridad - Qué tan urgente es
+    - @tarea.FechaLimite - Cuándo debe completarse
+    - @tarea.Proyecto.Nombre - A qué proyecto pertenece (si incluyes navegación)
+    
+    POR QUÉ USAR ESTOS MÉTODOS AQUÍ:
+    - Esta vista es el panel de trabajo diario del Desarrollador
+    - Solo ve SUS tareas asignadas, no las de otros desarrolladores
+    - Los botones de CambiarEstado son ESENCIALES para reportar avance
+    - El desarrollador NO puede crear, editar o eliminar tareas, solo cambiar su estado
+    - Cuando cambia el estado, el Líder puede ver el progreso en tiempo real
+    - Los botones deben mostrarse según el estado actual:
+      * Si está "Pendiente": mostrar botón "Iniciar Tarea"
+      * Si está "En Progreso": mostrar botón "Marcar Completa"
+      * Si está "Finalizado": no mostrar botones de cambio
+    ====================================================================================
+*@
 @model IEnumerable<TechSolutions_program.Models.Tarea>
 
 <h1>Mis Tareas</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Descripción</th>
+            <th>Estado</th>
+            <th>Prioridad</th>
+            <th>Fecha Límite</th>
+            <th>Proyecto</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var tarea in Model)
+        {
+            <tr>
+                <td>@tarea.Descripcion</td>
+                <td>
+                    <span class="badge 
+                        @(tarea.Estado == "Pendiente" ? "bg-secondary" : 
+                          tarea.Estado == "En Progreso" ? "bg-warning text-dark" : 
+                          "bg-success")">
+                        @tarea.Estado
+                    </span>
+                </td>
+                <td>
+                    <span class="badge 
+                        @(tarea.Prioridad == "Alta" ? "bg-danger" : 
+                          tarea.Prioridad == "Media" ? "bg-warning text-dark" : 
+                          "bg-success")">
+                        @tarea.Prioridad
+                    </span>
+                </td>
+                <td>@tarea.FechaLimite.ToString("dd/MM/yyyy")</td>
+                <td>@tarea.Proyecto.Nombre</td>
+                <td>
+                    <form asp-action="CambiarEstado" asp-route-id="@tarea.Id" method="post">
+                        @Html.AntiForgeryToken()
+                        @if (tarea.Estado == "Pendiente")
+                        {
+                            <button type="submit" name="nuevoEstado" value="En Progreso" class="btn btn-warning">
+                                Iniciar Tarea
+                            </button>
+                        }
+                        else if (tarea.Estado == "En Progreso")
+                        {
+                            <button type="submit" name="nuevoEstado" value="Finalizado" class="btn btn-success">
+                                Marcar Completa
+                            </button>
+                        }
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    @* Sección para scripts específicos de esta vista *@
+    <script>
+        // Aquí puedes agregar scripts JavaScript específicos para la vista MisTareas
+    </script>
+}
