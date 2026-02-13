@@ -1,8 +1,9 @@
-﻿namespace TechSolutions_program.Services
-{
-    public class ProyectoService
-    {
+﻿using TechSolutions_program.Models;
 
+namespace TechSolutions_program.Services
+{
+    public class ProyectoService : IProyectoService
+    {
         /*
          * ====================================================================================
          * CAPA DE LÓGICA DE NEGOCIO: GESTOR DE PROYECTOS
@@ -19,5 +20,29 @@
          * ====================================================================================
          */
 
+        public Task<IEnumerable<Proyecto>> GetProyectosAsync()
+        {
+            return Task.FromResult<IEnumerable<Proyecto>>(Array.Empty<Proyecto>());
+        }
+
+        public Task<Proyecto?> GetByIdAsync(int id)
+        {
+            return Task.FromResult<Proyecto?>(null);
+        }
+
+        public Task CrearAsync(Proyecto proyecto)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task ActualizarAsync(Proyecto proyecto)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task EliminarAsync(int id)
+        {
+            return Task.CompletedTask;
+        }
     }
 }

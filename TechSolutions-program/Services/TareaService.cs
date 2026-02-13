@@ -1,8 +1,9 @@
-﻿namespace TechSolutions_program.Services
-{
-    public class TareaService
-    {
+﻿using TechSolutions_program.Models;
 
+namespace TechSolutions_program.Services
+{
+    public class TareaService : ITareaService
+    {
         /*
          * ====================================================================================
          * CAPA DE LÓGICA DE NEGOCIO: GESTOR DE TAREAS
@@ -20,5 +21,39 @@
          * ====================================================================================
          */
 
+        public Task<IEnumerable<Tarea>> GetTareasAsync()
+        {
+            return Task.FromResult<IEnumerable<Tarea>>(Array.Empty<Tarea>());
+        }
+
+        public Task<IEnumerable<Tarea>> GetTareasPorResponsableAsync(string responsableId)
+        {
+            return Task.FromResult<IEnumerable<Tarea>>(Array.Empty<Tarea>());
+        }
+
+        public Task<Tarea?> GetByIdAsync(int id)
+        {
+            return Task.FromResult<Tarea?>(null);
+        }
+
+        public Task CrearAsync(Tarea tarea)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task ActualizarAsync(Tarea tarea)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task EliminarAsync(int id)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task CambiarEstadoAsync(int id, string nuevoEstado)
+        {
+            return Task.CompletedTask;
+        }
     }
 }

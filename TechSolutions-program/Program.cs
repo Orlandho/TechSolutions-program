@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TechSolutions_program.Data;
 using TechSolutions_program.Models;
+using TechSolutions_program.Services;
 
 namespace TechSolutions_program
 {
@@ -19,6 +20,8 @@ namespace TechSolutions_program
 
             builder.Services.AddDefaultIdentity<Usuario>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+            builder.Services.AddScoped<IProyectoService, ProyectoService>();
+            builder.Services.AddScoped<ITareaService, TareaService>();
             builder.Services.AddControllersWithViews();
 
             var app = builder.Build();
