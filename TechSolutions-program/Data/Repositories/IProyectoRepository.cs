@@ -1,5 +1,9 @@
 ﻿namespace TechSolutions_program.Data.Repositories
 {
+    /// <summary>
+    /// Contrato que define las operaciones de acceso a datos para la entidad Proyecto
+    /// Permite la inyección de dependencias y facilita el testing con mocks
+    /// </summary>
     public interface IProyectoRepository
     {
 

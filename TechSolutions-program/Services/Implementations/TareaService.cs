@@ -31,11 +31,20 @@ namespace TechSolutions_program.Services.Implementations
             _dbContext = dbContext;
         }
 
+        /// <summary>
+        /// Obtiene la lista de todas las tareas del sistema
+        /// Llamado desde: TareasController.Index() y SeguimientoController.Index()
+        /// </summary>
         public async Task<IEnumerable<Tarea>> GetTareasAsync()
         {
             return await _dbContext.Tareas.AsNoTracking().ToListAsync();
         }
 
+        /// <summary>
+        /// Obtiene las tareas asignadas a un desarrollador específico
+        /// Llamado desde: TareasController.MisTareas()
+        /// Permite que los desarrolladores vean solo sus tareas asignadas
+        /// </summary>
         public async Task<IEnumerable<Tarea>> GetTareasPorResponsableAsync(string responsableId)
         {
             return await _dbContext.Tareas.AsNoTracking()
@@ -43,23 +52,39 @@ namespace TechSolutions_program.Services.Implementations
                 .ToListAsync();
         }
 
+        /// <summary>
+        /// Obtiene una tarea específica por su ID
+        /// Llamado desde: TareasController.Edit(), Delete() y DeleteConfirmed()
+        /// </summary>
         public async Task<Tarea?> GetByIdAsync(int id)
         {
             return await _dbContext.Tareas.AsNoTracking().FirstOrDefaultAsync(t => t.Id == id);
         }
 
+        /// <summary>
+        /// Crea una nueva tarea en la base de datos
+        /// Llamado desde: TareasController.Create() [POST]
+        /// </summary>
         public async Task CrearAsync(Tarea tarea)
         {
             _dbContext.Tareas.Add(tarea);
             await _dbContext.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Actualiza una tarea existente
+        /// Llamado desde: TareasController.Edit() [POST]
+        /// </summary>
         public async Task ActualizarAsync(Tarea tarea)
         {
             _dbContext.Tareas.Update(tarea);
             await _dbContext.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Elimina una tarea de la base de datos
+        /// Llamado desde: TareasController.DeleteConfirmed() [POST]
+        /// </summary>
         public async Task EliminarAsync(int id)
         {
             var tarea = await _dbContext.Tareas.FirstOrDefaultAsync(t => t.Id == id);
@@ -72,6 +97,11 @@ namespace TechSolutions_program.Services.Implementations
             await _dbContext.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Cambia el estado de una tarea (Pendiente, En Progreso, Finalizado)
+        /// Llamado desde: TareasController.CambiarEstado() [POST]
+        /// Permite a los desarrolladores actualizar el progreso de sus tareas
+        /// </summary>
         public async Task CambiarEstadoAsync(int id, string nuevoEstado)
         {
             var tarea = await _dbContext.Tareas.FirstOrDefaultAsync(t => t.Id == id);

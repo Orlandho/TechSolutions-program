@@ -4,6 +4,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TechSolutions_program.Models
 {
+    /// <summary>
+    /// Entidad que representa una tarea asignada dentro de un proyecto
+    /// Permite el seguimiento del avance y la asignación de responsabilidades
+    /// Usada en: TareasController para gestionar asignaciones y cambios de estado
+    /// </summary>
     public class Tarea
     {
 
@@ -27,24 +32,53 @@ namespace TechSolutions_program.Models
         [Key]
         public int Id { get; set; }
 
+        /// <summary>
+        /// Descripción detallada de la tarea a realizar
+        /// Se muestra en: Listados de tareas y formularios de edición
+        /// </summary>
         [Required(ErrorMessage = "La descripción de la tarea es necesaria")]
         public string Descripcion { get; set; }
 
+        /// <summary>
+        /// Estado actual de la tarea: Pendiente, En Progreso, Terminado
+        /// Usado en: Dashboard para calcular avance y en botones de cambio de estado
+        /// Cambiado desde: TareasController.CambiarEstado()
+        /// </summary>
         [Required]
         public string Estado { get; set; } = "Pendiente"; // Pendiente, En Progreso, Terminado
 
+        /// <summary>
+        /// Prioridad de la tarea: Baja, Media, Alta
+        /// Usado en: Ordenamiento y filtros en vistas de tareas
+        /// </summary>
         [Required]
         public string Prioridad { get; set; } = "Media";
 
+        /// <summary>
+        /// ID del usuario (desarrollador) responsable de la tarea
+        /// Usado en: Filtro de MisTareas para mostrar solo las tareas del usuario actual
+        /// </summary>
         public string Responsable { get; set; }
 
+        /// <summary>
+        /// Fecha límite para completar la tarea
+        /// Usado en: Dashboard para identificar tareas con retraso
+        /// </summary>
         [DataType(DataType.Date)]
         public DateTime? FechaLimite { get; set; }
 
+        /// <summary>
+        /// ID del proyecto al que pertenece esta tarea
+        /// Usado en: Relación con la entidad Proyecto y filtros por proyecto
+        /// </summary>
         // Relación con Proyecto: Cada tarea pertenece a un Proyecto
         [Required]
         public int ProyectoId { get; set; }
 
+        /// <summary>
+        /// Navegación al proyecto padre
+        /// Usado en: Vistas de detalle para mostrar información del proyecto asociado
+        /// </summary>
         [ForeignKey("ProyectoId")]
         public virtual Proyecto Proyecto { get; set; }
     }
