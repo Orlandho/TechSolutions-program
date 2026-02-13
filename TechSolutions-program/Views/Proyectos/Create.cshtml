@@ -20,7 +20,22 @@
             <div class="card-body">
                 <form asp-action="Create" method="post">
                     @Html.AntiForgeryToken()
-                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                    
+                    @* Mostrar resumen de errores de validación *@
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            <h5 class="alert-heading">
+                                <i class="bi bi-exclamation-triangle-fill"></i> Errores de Validación
+                            </h5>
+                            <ul class="mb-0">
+                                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                                {
+                                    <li>@error.ErrorMessage</li>
+                                }
+                            </ul>
+                        </div>
+                    }
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
@@ -63,7 +78,7 @@
                             <label asp-for="FechaInicio" class="form-label">
                                 <i class="bi bi-calendar-event"></i> Fecha de Inicio <span class="text-danger">*</span>
                             </label>
-                            <input asp-for="FechaInicio" type="date" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                            <input asp-for="FechaInicio" type="date" class="form-control" />
                             <span asp-validation-for="FechaInicio" class="text-danger small"></span>
                         </div>
 
@@ -71,8 +86,7 @@
                             <label asp-for="FechaFinEstimada" class="form-label">
                                 <i class="bi bi-calendar-check"></i> Fecha Fin Estimada <span class="text-danger">*</span>
                             </label>
-                            <input asp-for="FechaFinEstimada" type="date" class="form-control" 
-                                   value="@DateTime.Now.AddMonths(3).ToString("yyyy-MM-dd")" />
+                            <input asp-for="FechaFinEstimada" type="date" class="form-control" />
                             <span asp-validation-for="FechaFinEstimada" class="text-danger small"></span>
                         </div>
 
@@ -128,6 +142,16 @@
                 </form>
             </div>
         </div>
+        
+        @* Información de ayuda *@
+        @if (clientes == null || !clientes.Any())
+        {
+            <div class="alert alert-warning mt-3">
+                <i class="bi bi-exclamation-triangle"></i>
+                <strong>Atención:</strong> No hay clientes disponibles. 
+                <a asp-controller="Clientes" asp-action="Create" class="alert-link">Crea un cliente primero</a>.
+            </div>
+        }
     </div>
 </div>
 
@@ -137,13 +161,30 @@
     <script>
         // Validación de fechas en el cliente
         document.querySelector('form').addEventListener('submit', function(e) {
-            const fechaInicio = new Date(document.querySelector('[name="FechaInicio"]').value);
-            const fechaFin = new Date(document.querySelector('[name="FechaFinEstimada"]').value);
+            const fechaInicio = document.querySelector('[name="FechaInicio"]').value;
+            const fechaFin = document.querySelector('[name="FechaFinEstimada"]').value;
             
-            if (fechaFin <= fechaInicio) {
-                e.preventDefault();
-                alert('La fecha fin debe ser posterior a la fecha de inicio.');
-                return false;
+            if (fechaInicio && fechaFin) {
+                const inicio = new Date(fechaInicio);
+                const fin = new Date(fechaFin);
+                
+                if (fin <= inicio) {
+                    e.preventDefault();
+                    alert('⚠️ La fecha fin debe ser posterior a la fecha de inicio.');
+                    return false;
+                }
+            }
+        });
+        
+        // Resaltar campos con errores
+        document.querySelectorAll('.text-danger.small').forEach(function(errorSpan) {
+            if (errorSpan.textContent.trim() !== '') {
+                const input = errorSpan.previousElementSibling;
+                if (input && (input.tagName === 'INPUT' || input.tagName === 'SELECT' || input.tagName === 'TEXTAREA')) {
+                    input.classList.add('is-invalid');
+                } else if (input && input.classList.contains('input-group')) {
+                    input.querySelector('input')?.classList.add('is-invalid');
+                }
             }
         });
     </script>

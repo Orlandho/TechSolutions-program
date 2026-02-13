@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace TechSolutions_program.Models
 {
@@ -37,28 +38,28 @@ namespace TechSolutions_program.Models
         /// Se muestra en: Listados de tareas y formularios de edición
         /// </summary>
         [Required(ErrorMessage = "La descripción de la tarea es necesaria")]
-        public string Descripcion { get; set; }
+        public string Descripcion { get; set; } = string.Empty;
 
         /// <summary>
         /// Estado actual de la tarea: Pendiente, En Progreso, Terminado
         /// Usado en: Dashboard para calcular avance y en botones de cambio de estado
         /// Cambiado desde: TareasController.CambiarEstado()
         /// </summary>
-        [Required]
+        [Required(ErrorMessage = "El estado es obligatorio")]
         public string Estado { get; set; } = "Pendiente"; // Pendiente, En Progreso, Terminado
 
         /// <summary>
         /// Prioridad de la tarea: Baja, Media, Alta
         /// Usado en: Ordenamiento y filtros en vistas de tareas
         /// </summary>
-        [Required]
+        [Required(ErrorMessage = "La prioridad es obligatoria")]
         public string Prioridad { get; set; } = "Media";
 
         /// <summary>
         /// ID del usuario (desarrollador) responsable de la tarea
         /// Usado en: Filtro de MisTareas para mostrar solo las tareas del usuario actual
         /// </summary>
-        public string ResponsableId { get; set; }
+        public string? ResponsableId { get; set; }
 
         /// <summary>
         /// Fecha límite para completar la tarea
@@ -71,15 +72,16 @@ namespace TechSolutions_program.Models
         /// ID del proyecto al que pertenece esta tarea
         /// Usado en: Relación con la entidad Proyecto y filtros por proyecto
         /// </summary>
-        // Relación con Proyecto: Cada tarea pertenece a un Proyecto
-        [Required]
+        [Required(ErrorMessage = "Debe especificar un proyecto")]
         public int ProyectoId { get; set; }
 
         /// <summary>
         /// Navegación al proyecto padre
         /// Usado en: Vistas de detalle para mostrar información del proyecto asociado
+        /// NOTA: Esta propiedad NO se valida en formularios, solo ProyectoId
         /// </summary>
         [ForeignKey("ProyectoId")]
-        public virtual Proyecto Proyecto { get; set; }
+        [BindNever] // No vincular en model binding para evitar validación
+        public virtual Proyecto? Proyecto { get; set; }
     }
 }

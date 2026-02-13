@@ -123,7 +123,14 @@ namespace TechSolutions_program.Controllers
                 // Recargar clientes en caso de error de validación
                 var clientes = await _proyectoService.GetClientesAsync();
                 ViewBag.Clientes = clientes;
-                TempData["ErrorMessage"] = "Por favor, corrija los errores en el formulario.";
+                
+                // Mostrar todos los errores en el log para debugging
+                var errors = ModelState.Values.SelectMany(v => v.Errors);
+                foreach (var error in errors)
+                {
+                    Console.WriteLine($"Error de validación: {error.ErrorMessage}");
+                }
+                
                 return View(proyecto);
             }
 
